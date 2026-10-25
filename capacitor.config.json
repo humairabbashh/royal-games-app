@@ -1,6 +1,7 @@
 {
   "appId": "com.royalgames.app",
   "appName": "Royal Games",
+  "version": "1.0.1",
   "webDir": "www",
   "server": { "androidScheme": "https" },
   "android": { "allowMixedContent": false }
