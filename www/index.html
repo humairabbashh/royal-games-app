@@ -27,6 +27,7 @@ body{background:radial-gradient(circle at 20% 0,#5b2bb0 0,transparent 45%),linea
 .back{width:auto;padding:8px 16px;margin:0 0 10px;font-size:14px;background:rgba(255,255,255,.16);box-shadow:none;color:#fff}
 .dg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:10px 0}.dy{background:rgba(255,255,255,.12);border-radius:10px;padding:6px 0;text-align:center;font-size:10px;border:2px solid transparent}.dy b{display:block;font-size:15px}.dy.dn{background:#15803d}.dy.td{border-color:var(--g);animation:pl 1s infinite}.dy.bn2{background:#be185d}@keyframes pl{50%{transform:scale(1.08)}}
 nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-width:456px;background:#0b0614;border-radius:26px;padding:8px;display:flex;box-shadow:0 10px 28px rgba(0,0,0,.5);z-index:40}
+body.has-banner nav{bottom:calc(62px + env(safe-area-inset-bottom,0px))}
 nav button{flex:1;padding:10px 0;border:0;border-radius:18px;background:none;color:#fff;opacity:.65;font-size:12.5px;font-weight:600}nav button.on{opacity:1;background:linear-gradient(#ffb02e,#f08a00)}
 #gs{position:fixed;inset:0;z-index:50;background:linear-gradient(var(--b1),#2a1458);display:none;overflow:auto;padding:0 12px 24px;max-width:480px;margin:0 auto}
 .gh{display:flex;align-items:center;gap:10px;padding:12px 0;font-size:18px}.gh b{flex:1}
@@ -123,7 +124,36 @@ function earnG(n){const d=new Date().toDateString();if(S.de.d!==d)S.de={d,n:0};c
 function beep(f){if(!S.snd)return;try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator();o.frequency.value=f;o.connect(a.destination);o.start();o.stop(a.currentTime+.08)}catch(e){}}
 // ---- links / ads ----
 let adCb=null;
-function showAd(done,tick){if(window.AppInventor&&window.AppInventor.setWebViewString){adCb=done;if(tick)tick('Loading ad…');try{window.AppInventor.setWebViewString('SHOW_AD:'+Date.now())}catch(e){adCb=null}return}
+// ---- AdMob (real ads via Capacitor plugin; Google test IDs until real IDs are added) ----
+const AD_BANNER='ca-app-pub-3940256099942544/6300978111';
+const AD_INTER='ca-app-pub-3940256099942544/1033173712';
+const AD_REWARD='ca-app-pub-3940256099942544/5224354917';
+const ADM=()=>(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.AdMob)||null;
+let adsStarted=false,admReady=false,interLoaded=false,interLoading=false,rewardLoaded=false,rewardLoading=false,rewardCb=null,pendingReward=null,interTimer=null;
+function initAds(){const A=ADM();if(!A||adsStarted)return;adsStarted=true;
+ A.addListener('bannerAdLoaded',()=>{document.body.classList.add('has-banner')});
+ A.addListener('bannerAdFailedToLoad',()=>{setTimeout(tryShowBanner,30000)});
+ A.addListener('interstitialAdLoaded',()=>{interLoaded=true;interLoading=false});
+ A.addListener('interstitialAdFailedToLoad',()=>{interLoading=false;interLoaded=false;setTimeout(prepareInter,30000)});
+ A.addListener('interstitialAdDismissed',()=>{interLoaded=false;prepareInter()});
+ A.addListener('interstitialAdFailedToShow',()=>{interLoaded=false;prepareInter()});
+ A.addListener('onRewardedVideoAdLoaded',()=>{rewardLoaded=true;rewardLoading=false;if(pendingReward){const p=pendingReward;pendingReward=null;rewardCb=p;if(p.tick)p.tick('📺 Ad…');A.showRewardVideoAd().catch(()=>{rewardCb=null;if(p.fail)p.fail()})}});
+ A.addListener('onRewardedVideoAdFailedToLoad',()=>{rewardLoading=false;rewardLoaded=false;setTimeout(prepareReward,30000)});
+ A.addListener('onRewardedVideoAdReward',()=>{if(rewardCb){const f=rewardCb;rewardCb=null;f.done()}});
+ A.addListener('onRewardedVideoAdDismissed',()=>{rewardLoaded=false;prepareReward();if(rewardCb){const f=rewardCb;rewardCb=null;if(f.fail)f.fail()}});
+ A.addListener('onRewardedVideoAdFailedToShow',()=>{if(rewardCb){const f=rewardCb;rewardCb=null;if(f.fail)f.fail()}prepareReward()});
+ A.initialize().then(()=>{admReady=true;tryShowBanner();prepareInter();prepareReward()}).catch(()=>{});
+ interTimer=setInterval(()=>{if(interLoaded){interLoaded=false;const B=ADM();if(B)B.showInterstitial().catch(()=>{prepareInter()})}else if(!interLoading)prepareInter()},120000)}
+function stopAds(){const A=ADM();if(A)A.removeBanner().catch(()=>{});if(interTimer){clearInterval(interTimer);interTimer=null}document.body.classList.remove('has-banner');adsStarted=false;admReady=false;interLoaded=false;interLoading=false;rewardLoaded=false;rewardLoading=false;rewardCb=null;pendingReward=null}
+function tryShowBanner(){const A=ADM();if(!A||!admReady)return;A.showBanner({adId:AD_BANNER,adSize:'BANNER',position:'BOTTOM_CENTER',margin:0}).catch(()=>{})}
+function prepareInter(){const A=ADM();if(!A||!admReady||interLoading||interLoaded)return;interLoading=true;A.prepareInterstitial({adId:AD_INTER}).catch(()=>{interLoading=false})}
+function prepareReward(){const A=ADM();if(!A||!admReady||rewardLoading||rewardLoaded)return;rewardLoading=true;A.prepareRewardVideoAd({adId:AD_REWARD}).catch(()=>{rewardLoading=false})}
+function showAd(done,tick,fail){const A=ADM();
+ if(A){
+  if(rewardLoaded){rewardCb={done,fail};if(tick)tick('📺 Ad…');A.showRewardVideoAd().catch(()=>{rewardCb=null;if(fail)fail()});return}
+  pendingReward={done,tick,fail};if(tick)tick('Loading ad…');prepareReward();
+  setTimeout(()=>{if(pendingReward&&pendingReward.done===done){pendingReward=null;if(tick)tick('Ad failed — try again');if(fail)fail()}},20000);return}
+ if(window.AppInventor&&window.AppInventor.setWebViewString){adCb=done;if(tick)tick('Loading ad…');try{window.AppInventor.setWebViewString('SHOW_AD:'+Date.now())}catch(e){adCb=null}return}
  let n=3;if(tick)tick('📺 Demo ad… '+n);const t=setInterval(()=>{n--;if(n>0){if(tick)tick('📺 Demo ad… '+n)}else{clearInterval(t);done()}},1000)}
 window.onAdReward=()=>{if(adCb){const f=adCb;adCb=null;f()}};window.onAdFail=()=>{adCb=null;go(tab)};
 function lm(u){const m=$('mo');m.style.display='flex';m.innerHTML=`<div class='mb2 tc'><h3>Open the link</h3><p style='word-break:break-all;font-size:13px;opacity:.8'>${u}</p><a class='b' href='${u}' target='_blank' rel='noopener'>Open link</a><button class='b p' id='lc'>Copy link</button><button class='b back' id='lx'>Close</button></div>`;
@@ -309,9 +339,9 @@ function sub(){const m=$('mn'),td=new Date().toDateString(),bk=`<button class='b
   $('ck').onclick=()=>{S.stk=nx;S.ci=td;add(R[nx-1]);sub()}}
  else if(scr=='chips'){const can=S.cd!==td;m.innerHTML=bk+`<div class='cd tc'><h2>♠ Free Chips</h2><p>Chips are entry tickets for the Carrom Challenge. They are free only and cannot be bought or converted.</p><h3 style='color:var(--g)'>You have ♠ ${S.chips}</h3><button class='b' id='cq' ${can?'':'disabled'}>${can?'Claim daily 200 chips':'Come back tomorrow'}</button><button class='b p' id='cw'>📺 Watch ad · +100 chips</button></div>`;
   $('cq').onclick=()=>{S.chips+=200;S.cd=td;save();hdr();sub()};
-  $('cw').onclick=()=>{const b=$('cw');b.disabled=true;showAd(()=>{S.chips+=100;save();hdr();sub()},x=>{b.textContent=x})}}
+  $('cw').onclick=()=>{const b=$('cw');b.disabled=true;showAd(()=>{S.chips+=100;save();hdr();sub()},x=>{b.textContent=x},()=>sub())}}
  else if(scr=='ad'){m.innerHTML=bk+`<div class='cd tc'><h2>📺 Watch Ads</h2><p>Watch a short ad and get <b>+${CFG.adC} 🪙</b>. Watched so far: ${S.ads||0}</p><button class='b' id='e2'>Watch ad</button></div>`;
-  $('e2').onclick=()=>{const b=$('e2');b.disabled=true;showAd(()=>{S.ads=(S.ads||0)+1;add(CFG.adC);sub()},x=>{b.textContent=x})}}
+  $('e2').onclick=()=>{const b=$('e2');b.disabled=true;showAd(()=>{S.ads=(S.ads||0)+1;add(CFG.adC);sub()},x=>{b.textContent=x},()=>sub())}}
  else{const s=S.st,M=[['Play 3 Carrom games',(s.lg||0)>=3,30,'a',Math.min(s.lg||0,3)+'/3'],['Win a Carrom game',(s.lw||0)>=1,40,'b',Math.min(s.lw||0,1)+'/1'],['Race 1000 m in Turbo Racer',(s.rb||0)>=1000,30,'i',Math.min(s.rb||0,1000)+'/1000'],['Win a Memory Match',(s.mm||0)>=1,20,'c',Math.min(s.mm||0,1)+'/1'],['Score 10 in Snake',(s.bs||0)>=10,30,'d',Math.min(s.bs||0,10)+'/10'],['Reach 256 in 2048',(s.m24||0)>=256,40,'e',Math.min(s.m24||0,256)+'/256'],['Beat the bot in Tic-Tac-Toe',(s.ttt||0)>=1,20,'f',Math.min(s.ttt||0,1)+'/1'],['Watch 3 ads',(S.ads||0)>=3,30,'g',Math.min(S.ads||0,3)+'/3'],['Watch 10 ads',(S.ads||0)>=10,80,'h',Math.min(S.ads||0,10)+'/10']];
   m.innerHTML=bk+`<div class='cd'><h2>🎯 Missions</h2>${M.map(x=>`<div class='row'><span>${x[0]} <small>(${x[4]})</small></span><button class='sm' data-k='${x[3]}' ${x[1]&&!S.cl[x[3]]?'':'disabled'}>${S.cl[x[3]]?'Claimed':'+'+x[2]+' 🪙'}</button></div>`).join('')}</div>`;
   m.querySelectorAll('.sm').forEach(b=>b.onclick=()=>{const x=M.find(y=>y[3]==b.dataset.k);S.cl[x[3]]=1;add(x[2]);sub()})}
@@ -416,8 +446,8 @@ function newCap(){const ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';cap='';for(let i=0
  for(let i=0;i<6;i++){x.strokeStyle='hsl('+Math.random()*360+',60%,55%)';x.lineWidth=1.5;x.beginPath();x.moveTo(Math.random()*150,Math.random()*46);x.lineTo(Math.random()*150,Math.random()*46);x.stroke()}
  x.font='bold 28px sans-serif';x.textBaseline='middle';for(let i=0;i<5;i++){x.save();x.translate(14+i*27,24);x.rotate((Math.random()-.5)*.6);x.fillStyle='hsl('+Math.random()*360+',70%,35%)';x.fillText(cap[i],-9,0);x.restore()}
  for(let i=0;i<40;i++){x.fillStyle='rgba(0,0,0,.25)';x.fillRect(Math.random()*150,Math.random()*46,2,2)}}
-function enter(id,nm,isNew,rf){lss('rg_sess',id);UID=id;loadS();if(isNew){S.nm=nm;if(rf){S.used=rf;S.coins+=CFG.frB}}save();try{localStorage.removeItem('rg_ref')}catch(e){}$('au').style.display='none';hdr();go('home')}
-function logout(){try{localStorage.removeItem('rg_sess')}catch(e){}AU.mem.rg_sess='';UID=null;S=DEF();const m=$('mo');m.style.display='none';closeGame();showAuth('in')}
+function enter(id,nm,isNew,rf){lss('rg_sess',id);UID=id;loadS();if(isNew){S.nm=nm;if(rf){S.used=rf;S.coins+=CFG.frB}}save();try{localStorage.removeItem('rg_ref')}catch(e){}$('au').style.display='none';hdr();initAds();go('home')}
+function logout(){try{localStorage.removeItem('rg_sess')}catch(e){}AU.mem.rg_sess='';UID=null;S=DEF();const m=$('mo');m.style.display='none';closeGame();stopAds();showAuth('in')}
 function showAuth(mode){const su=mode=='up',fg=mode=='fg';let m=$('au');if(!m){m=document.createElement('div');m.id='au';document.body.appendChild(m)}m.style.display='block';m.scrollTop=0;
  const fi=(ic,h)=>`<div class='fi'><span>${ic}</span>${h}</div>`;
  m.innerHTML=`<div class='in'><div class='lg'>👑</div><h1>Royal Games</h1><p style='opacity:.85;margin:0'>Play free games · Earn rewards</p>
@@ -457,6 +487,6 @@ function showAuth(mode){const su=mode=='up',fg=mode=='fg';let m=$('au');if(!m){m
    const u=usersG()[id];if(!u){er.textContent='Account not found. Please sign up.';return}
    const h=await hp(pw,u.s);if(h!==u.h){AU.f=(AU.f||0)+1;if(AU.f>=5){AU.lk=Date.now()+30000;AU.f=0}er.textContent='Wrong password';return}
    AU.f=0;enter(id,u.n,false,'')}}}
-hdr();if(UID&&usersG()[UID]){go('home')}else showAuth(Object.keys(usersG()).length?'in':'up');
+hdr();if(UID&&usersG()[UID]){initAds();go('home')}else showAuth(Object.keys(usersG()).length?'in':'up');
 
 </script></body></html>
