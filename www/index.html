@@ -96,15 +96,13 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(
 .ldb{position:relative;width:100%;aspect-ratio:1;background:var(--bbg,#fffdf5);border-radius:16px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.35),0 0 0 5px rgba(255,255,255,.25),0 16px 34px rgba(0,0,0,.5)}
 .ldb i{position:absolute;box-sizing:border-box}.bs{width:40%;height:40%;border-radius:14px}.bs::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 45%)}.bi{inset:16.6%;background:#fff;border-radius:12px}.sp{width:6%;height:6%;border-radius:50%;background:rgba(0,0,0,.12);transform:translate(-50%,-50%)}
 .lc{width:6.6667%;height:6.6667%;background:#fff;border:1px solid rgba(0,0,0,.14);font-style:normal;font-size:11px;color:#fff;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 1px rgba(0,0,0,.4)}
-.ldb .lc:not([style*=background]){color:#f59e0b;text-shadow:none}
+.ldb .lc:not([style*=background]){color:#475569;text-shadow:none}
 .ct{width:20%;height:20%;background:conic-gradient(from -45deg,#22c55e 0 90deg,#eab308 90deg 180deg,#3b82f6 180deg 270deg,#ef4444 270deg 360deg)}
-.tk{position:absolute;width:6.4%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);border:0;box-shadow:0 0 0 2px #fff,0 4px 8px rgba(0,0,0,.55),inset 0 -4px 6px rgba(0,0,0,.35);transition:left .14s linear,top .14s linear;z-index:5;left:50%;top:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 32% 26%,var(--tl,#fca5a5) 0%,var(--tc,#ef4444) 52%,var(--td,#991b1b) 100%)}
-.tk::before{content:'';position:absolute;inset:16%;border-radius:50%;border:2px solid rgba(255,255,255,.7);box-shadow:inset 0 2px 4px rgba(0,0,0,.3);pointer-events:none}
-.tk::after{content:'';position:absolute;left:20%;top:12%;width:26%;height:18%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.95),rgba(255,255,255,0) 70%);transform:rotate(-18deg);pointer-events:none}
-.tk i{position:relative;z-index:2;width:62%;height:62%;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4),inset 0 -2px 3px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:900;line-height:1}
-.tk.royal{box-shadow:0 0 0 2px #ffd23f,0 4px 8px rgba(0,0,0,.55),inset 0 -4px 6px rgba(0,0,0,.35)}
-.tk.mv{animation:mvp .6s infinite;cursor:pointer;z-index:9;box-shadow:0 0 0 3px #ffd23f,0 0 16px 5px rgba(255,210,63,.8)}@keyframes mvp{50%{transform:translate(-50%,-50%) scale(1.3)}}
-.ldc{display:flex;align-items:center;gap:10px;margin:10px 0}.lms{flex:1;font-size:14px;min-height:40px;display:flex;align-items:center}.ldc #lroll{flex:none;width:104px;margin:0;padding:12px 4px;font-size:15px}
+.ch{position:absolute;font-size:8px;font-weight:900;letter-spacing:.5px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.65);pointer-events:none;z-index:2;transform:translate(-50%,-50%);white-space:nowrap}
+.tk{position:absolute;width:7.6%;aspect-ratio:1;transform:translate(-50%,-50%);border:0;transition:left .14s linear,top .14s linear;z-index:5;left:50%;top:50%;filter:drop-shadow(0 3px 2px rgba(0,0,0,.5))}
+.tk svg{width:100%;height:100%;display:block;overflow:visible}
+.tk.mv{animation:mvp .6s infinite;cursor:pointer;z-index:9;filter:drop-shadow(0 0 3px #ffd23f) drop-shadow(0 0 12px rgba(255,210,63,.9))}@keyframes mvp{50%{transform:translate(-50%,-50%) scale(1.25)}}
+.ldc{display:flex;align-items:center;gap:10px;margin:10px 0}.lms{flex:1;font-size:14px;min-height:40px;display:flex;align-items:center}.ldc #lroll{flex:none;width:78px;margin:0;padding:9px 4px;font-size:13px;border-radius:999px;background:linear-gradient(180deg,#fde68a,#f59e0b);color:#451a03;box-shadow:0 3px 0 #b45309}
 /* Ludo side layout: dice dock moves above/below the board with the turn */
 .lucol{display:flex;flex-direction:column}.lucol #lplTop{order:0}.lucol #ldcRow{order:3}.lucol.dice-top #ldcRow{order:1}.lucol #ldb{order:2}.lucol #lplBot{order:4}.lucol #lquit{order:5}.lucol #lres{order:6}
 .dice{width:80px;height:80px;flex:none;border-radius:18px;border:3px solid #ffd23f;box-shadow:0 6px 0 rgba(0,0,0,.4),0 12px 20px rgba(0,0,0,.45),inset 0 3px 8px rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.35);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:9px;gap:2px}.dice u{border-radius:50%;background:transparent;margin:auto;width:13px;height:13px}.dice u.on{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,0) 55%),var(--dd,#111);box-shadow:0 1px 2px rgba(0,0,0,.55),inset 0 -2px 3px rgba(0,0,0,.35)}.dice.go{animation:mvp .8s infinite}
@@ -387,19 +385,25 @@ function luBuildBoard(){const b=$('ldb');if(!b)return;let h='';
  for(const k of ['R','G','Y','B']){const [l,t]=bp[k];h+=`<i class='bs' style='left:${l}%;top:${t}%;background:${LU_COLOR[k]}'><i class='bi'></i></i>`}
  for(const k of ['R','G','Y','B'])for(const [r,c] of LU_BASE[k])h+=`<i class='sp' style='left:${(c+.5)*100/15}%;top:${(r+.5)*100/15}%;background:${LU_COLOR[k]}44'></i>`;
  const startCol={};for(const k of ['R','G','Y','B'])startCol[LU_START[k]]=LU_COLOR[k];
- LU_PATH.forEach(([r,c],i)=>{const col=startCol[i];h+=`<i class='lc' style='left:${c*100/15}%;top:${r*100/15}%;${col?`background:${col};`:''}'>${LU_SAFE.has(i)?'★':''}</i>`});
+ const AR={'0,1':'→','1,0':'↓','0,-1':'←','-1,0':'↑','-1,1':'↗','1,1':'↘','1,-1':'↙','-1,-1':'↖'};
+ LU_PATH.forEach(([r,c],i)=>{const col=startCol[i];let mk='';
+  if(LU_SAFE.has(i))mk=[0,13,26,39].includes(i)?'○':'△';
+  else{const [nr,nc]=LU_PATH[(i+1)%52];mk=AR[(nr-r)+','+(nc-c)]||''}
+  h+=`<i class='lc' style='left:${c*100/15}%;top:${r*100/15}%;${col?`background:${col};`:''}'>${mk}</i>`});
  for(const k of ['R','G','Y','B'])for(const [r,c] of LU_HOME[k])h+=`<i class='lc' style='left:${c*100/15}%;top:${r*100/15}%;background:${LU_COLOR[k]}'></i>`;
  h+=`<i class='ct' style='left:40%;top:40%'></i>`;
+ h+=`<i class='ch' style='left:50%;top:43.5%'>HOME</i><i class='ch' style='left:56.5%;top:50%;transform:translate(-50%,-50%) rotate(90deg)'>HOME</i><i class='ch' style='left:50%;top:56.5%;transform:translate(-50%,-50%) rotate(180deg)'>HOME</i><i class='ch' style='left:43.5%;top:50%;transform:translate(-50%,-50%) rotate(-90deg)'>HOME</i>`;
  b.innerHTML=h}
 const LU_TONE={R:['#fca5a5','#ef4444','#991b1b'],G:['#86efac','#22c55e','#166534'],Y:['#fde047','#eab308','#854d0e'],B:['#93c5fd','#3b82f6','#1e40af']};
 const LU_GOLD=['#fef9c3','#f59e0b','#92400e'];
+function luPawnSVG(color,skin,uid){const t=LU_TONE[color],g=LU_GOLD;
+ const body=skin=='gold'?g[1]:t[1],dark=skin=='gold'?g[2]:t[2],light=skin=='gold'?g[0]:t[0];
+ const med=skin=='chip'?['#1e293b','#ffd23f','♠']:skin=='gold'?['#ffffff',t[1],'★']:skin=='royal'?['#ffffff','#b45309','₹']:null;
+ const ring=skin=='royal'?'#ffd23f':'#ffffff';
+ return `<svg viewBox='0 0 100 100'><defs><linearGradient id='pg${uid}' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${light}'/><stop offset='.55' stop-color='${body}'/><stop offset='1' stop-color='${dark}'/></linearGradient></defs><ellipse cx='50' cy='88' rx='36' ry='10' fill='${ring}' stroke='rgba(0,0,0,.3)' stroke-width='2'/><path d='M50 26 C62 36 67 50 69 64 C70 76 66 84 50 84 C34 84 30 76 31 64 C33 50 38 36 50 26 Z' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><circle cx='50' cy='20' r='14' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><ellipse cx='43' cy='14' rx='5' ry='3.5' fill='rgba(255,255,255,.85)' transform='rotate(-20 43 14)'/>${med?`<circle cx='50' cy='60' r='13' fill='${med[0]}' stroke='rgba(0,0,0,.25)' stroke-width='1.5'/><text x='50' y='66' text-anchor='middle' font-size='16' font-weight='900' fill='${med[1]}'>${med[2]}</text>`:''}</svg>`}
 function luMakeTokens(){const b=$('ldb');if(!b)return;
  LU.players.forEach((pl,pi)=>{pl.tokens.forEach((_,ti)=>{const el=document.createElement('div');el.className='tk';el.id='ltk-'+pi+'-'+ti;
-  const sk=LU.skin,tone=sk=='gold'?LU_GOLD:LU_TONE[pl.color];
-  el.style.cssText=`--tl:${tone[0]};--tc:${tone[1]};--td:${tone[2]};`;
-  if(sk=='chip'){el.innerHTML=`<i style="background:#1e293b;color:#ffd23f">♠</i>`}
-  else if(sk=='gold'){el.innerHTML=`<i style="color:${LU_TONE[pl.color][1]}">★</i>`}
-  else if(sk=='royal'){el.classList.add('royal');el.innerHTML=`<i style="color:#b45309">₹</i>`}
+  el.innerHTML=luPawnSVG(pl.color,LU.skin,pi+'-'+ti);
   b.appendChild(el)})});
  luRenderTokens()}
 function luPosOf(pl,ti){const p=pl.tokens[ti];
@@ -443,15 +447,17 @@ function luRoll(isBot){if(!LU||LU.over)return;const pl=LU.players[LU.turn];
  luRollAnim(v,()=>{if(!LU||LU.over)return;const legal=luLegal(pl.tokens,v);
   if(!legal.length){luMsg(`🎲 ${v} — no move possible. Turn passes.`);beep(200);lgo(()=>luEndTurn(),1100);return}
   if(pl.isBot){lgo(()=>{if(!LU||LU.over)return;const ti=luBotPick(LU.players,LU.turn,v);if(ti>=0)luMove(ti);else luEndTurn()},600)}
+  else if(legal.length===1){luMsg(`🎲 You rolled ${v} — only one move, moving it!`);lgo(()=>{if(!LU||LU.over)return;luMove(legal[0])},500)}
   else{luMsg(`🎲 You rolled ${v} — tap a glowing token`);luHighlight(legal)}})}
 function luHighlight(legal){LU.movable=legal;legal.forEach(ti=>{const el=$('ltk-0-'+ti);if(el){el.classList.add('mv');el.onclick=()=>luMove(ti)}})}
 function luClearHighlight(){if(!LU)return;(LU.movable||[]).forEach(ti=>{const el=$('ltk-0-'+ti);if(el){el.classList.remove('mv');el.onclick=null}});LU.movable=[]}
 function luMove(ti){if(!LU||LU.over||LU.moving)return;const pl=LU.players[LU.turn],d=LU.dice,g=LU.gid;
  const from=pl.tokens[ti];if(from>=57||from+d>57)return;
- const caps=luCapsAt(LU.players,LU.turn,from+d);
+ const dist=from===0?1:d; // 6 to exit: token lands on the start cell only — the 6 is spent, no extra advance
+ const caps=luCapsAt(LU.players,LU.turn,from+dist);
  luClearHighlight();LU.moving=true;let step=0;
  const stepFn=()=>{if(!LU||LU.gid!==g||LU.over||!$('gc'))return;step++;pl.tokens[ti]=from+step;luRenderTokens();beep(500);
-  if(step<d){setTimeout(stepFn,150);return}
+  if(step<dist){setTimeout(stepFn,150);return}
   LU.moving=false;
   let msg='';
   if(caps.length){caps.forEach(([j,k])=>{LU.players[j].tokens[k]=0});msg+='💥 Captured! ';beep(900)}
