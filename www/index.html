@@ -105,7 +105,7 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(
 .ldc{display:flex;align-items:center;gap:10px;margin:10px 0}.lms{flex:1;font-size:14px;min-height:40px;display:flex;align-items:center}.ldc #lroll{flex:none;width:78px;margin:0;padding:9px 4px;font-size:13px;border-radius:999px;background:linear-gradient(180deg,#fde68a,#f59e0b);color:#451a03;box-shadow:0 3px 0 #b45309}
 /* Ludo side layout: dice dock moves above/below the board with the turn */
 .lucol{display:flex;flex-direction:column}.lucol #lplTop{order:0}.lucol #ldcRow{order:3}.lucol.dice-top #ldcRow{order:1}.lucol #ldb{order:2}.lucol #lplBot{order:4}.lucol #lquit{order:5}.lucol #lres{order:6}
-.dice{width:80px;height:80px;flex:none;border-radius:18px;border:3px solid #ffd23f;box-shadow:0 6px 0 rgba(0,0,0,.4),0 12px 20px rgba(0,0,0,.45),inset 0 3px 8px rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.35);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:9px;gap:2px}.dice u{border-radius:50%;background:transparent;margin:auto;width:13px;height:13px}.dice u.on{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,0) 55%),var(--dd,#111);box-shadow:0 1px 2px rgba(0,0,0,.55),inset 0 -2px 3px rgba(0,0,0,.35)}.dice.go{animation:mvp .8s infinite}
+.dice{width:92px;height:92px;flex:none;border-radius:20px;border:3px solid #ffd23f;box-shadow:0 6px 0 rgba(0,0,0,.4),0 12px 20px rgba(0,0,0,.45),inset 0 3px 8px rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.35);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:10px;gap:2px}.dice u{border-radius:50%;background:transparent;margin:auto;width:15px;height:15px}.dice u.on{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,0) 55%),var(--dd,#111);box-shadow:0 1px 2px rgba(0,0,0,.55),inset 0 -2px 3px rgba(0,0,0,.35)}.dice.go{animation:tumble .5s ease-in-out infinite}@keyframes tumble{0%{transform:rotate(0) scale(1)}25%{transform:rotate(9deg) scale(1.07)}50%{transform:rotate(-9deg) scale(1.09)}75%{transform:rotate(6deg) scale(1.06)}100%{transform:rotate(0) scale(1)}}
 [data-th=b]{--bbg:#dbeafe}[data-th=r]{--bbg:#ffe4e6}[data-th=k]{--bbg:#3f3f46}
 
 .ccn{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
@@ -429,12 +429,12 @@ function luStrip(){if(!LU)return;
  const col=$('lucol');if(col){const actTop=LU.players[LU.turn]&&side(LU.players[LU.turn])==='top';col.classList.toggle('dice-top',!!actTop);col.classList.toggle('dice-bot',!actTop)}}
 const LU_PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 function luSetDice(v,skin){const d=$('ldice');if(!d)return;
- d.innerHTML=Array.from({length:9},(_,i)=>`<u class='${LU_PIPS[v].includes(i)?'on':''}'></u>`).join('');
- const st={classic:'--dd:#ffd23f;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#fca5a5,#dc2626 45%,#7f1d1d)',chip:'--dd:#ffd23f;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#64748b,#0f172a 55%,#020617)',gold:'--dd:#451a03;border-color:#fff7cc;background:radial-gradient(circle at 30% 25%,#fef9c3,#f59e0b 55%,#b45309)',royal:'--dd:#7f1d1d;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#fde68a,#d97706 50%,#92400e)'};
+ d.innerHTML=Array.from({length:9},(_,i)=>{const on=LU_PIPS[v].includes(i);const red=on&&skin=='classic'&&v==1&&i==4;return `<u class='${on?'on':''}'${red?" style='--dd:#dc2626'":''}></u>`}).join('');
+ const st={classic:'--dd:#1e40af;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#ffffff,#f8fafc 40%,#e2e8f0 72%,#cbd5e1)',chip:'--dd:#ffd23f;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#64748b,#0f172a 55%,#020617)',gold:'--dd:#451a03;border-color:#fff7cc;background:radial-gradient(circle at 30% 25%,#fef9c3,#f59e0b 55%,#b45309)',royal:'--dd:#7f1d1d;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#fde68a,#d97706 50%,#92400e)'};
  d.style.cssText=st[skin]||st.classic}
 function luRollAnim(final,cb){const d=$('ldice');const g=LU?LU.gid:0;if(d)d.classList.add('go');let n=0;
  const t=setInterval(()=>{if(!LU||LU.gid!==g||!$('ldice')){clearInterval(t);return}luSetDice(1+Math.floor(Math.random()*6),LU.skin);
-  if(++n>=6){clearInterval(t);if(d)d.classList.remove('go');luSetDice(final,LU.skin);if(LU&&LU.gid===g)cb()}},90)}
+  if(++n>=7){clearInterval(t);if(d)d.classList.remove('go');luSetDice(final,LU.skin);if(LU&&LU.gid===g)cb()}},70)}
 function luBiasedDie(isBot){const p=isBot?LU_DICE_BIAS.bot6:LU_DICE_BIAS.player6;if(Math.random()<p)return 6;return 1+Math.floor(Math.random()*5)}
 function luMsg(t){const m=$('lms');if(m)m.innerHTML=t}
 function luTurn(){if(!LU||LU.over)return;const pl=LU.players[LU.turn];luStrip();LU.rolled=false;LU.canRoll=!pl.isBot;
