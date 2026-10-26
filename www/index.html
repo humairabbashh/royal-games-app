@@ -93,19 +93,35 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(
 .dots{display:flex;gap:6px;justify-content:center;margin:10px 0}.dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3)}.dots i.on{background:#ffd23f}
 
 .lpl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}.lp{background:rgba(255,255,255,.1);border-bottom:4px solid var(--c);border-radius:12px;padding:6px 2px;text-align:center;font-size:11px;opacity:.75;transition:.3s}.lp.on{opacity:1;background:rgba(255,255,255,.22);transform:translateY(-2px);box-shadow:0 0 14px var(--c)}.lp span{font-size:20px;display:block}.lp b{display:block}.lp small{opacity:.85}
-.ldb{position:relative;width:100%;aspect-ratio:1;background:var(--bbg,#fffdf5);border-radius:16px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.35),0 0 0 5px rgba(255,255,255,.25),0 16px 34px rgba(0,0,0,.5)}
+.ldb{position:relative;width:86%;margin:0 auto;aspect-ratio:1;background:var(--bbg,#fffdf5);border-radius:16px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.35),0 0 0 5px rgba(255,255,255,.25),0 16px 34px rgba(0,0,0,.5)}
 .ldb i{position:absolute;box-sizing:border-box}.bs{width:40%;height:40%;border-radius:14px}.bs::after{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 45%)}.bi{inset:16.6%;background:#fff;border-radius:12px}.sp{width:6%;height:6%;border-radius:50%;background:rgba(0,0,0,.12);transform:translate(-50%,-50%)}
 .lc{width:6.6667%;height:6.6667%;background:#fff;border:1px solid rgba(0,0,0,.14);font-style:normal;font-size:11px;color:#fff;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 1px rgba(0,0,0,.4)}
 .ldb .lc:not([style*=background]){color:#475569;text-shadow:none}
 .ct{width:20%;height:20%;background:conic-gradient(from -45deg,#22c55e 0 90deg,#eab308 90deg 180deg,#3b82f6 180deg 270deg,#ef4444 270deg 360deg)}
 .ch{position:absolute;font-size:8px;font-weight:900;letter-spacing:.5px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.65);pointer-events:none;z-index:2;transform:translate(-50%,-50%);white-space:nowrap}
-.tk{position:absolute;width:7.6%;aspect-ratio:1;transform:translate(-50%,-50%);border:0;transition:left .14s linear,top .14s linear;z-index:5;left:50%;top:50%;filter:drop-shadow(0 3px 2px rgba(0,0,0,.5))}
+.tk{position:absolute;width:8.8%;aspect-ratio:1;transform:translate(-50%,-50%);border:0;transition:left .14s linear,top .14s linear;z-index:5;left:50%;top:50%;filter:drop-shadow(0 3px 2px rgba(0,0,0,.5))}
 .tk svg{width:100%;height:100%;display:block;overflow:visible}
 .tk.mv{animation:mvp .6s infinite;cursor:pointer;z-index:9;filter:drop-shadow(0 0 3px #ffd23f) drop-shadow(0 0 12px rgba(255,210,63,.9))}@keyframes mvp{50%{transform:translate(-50%,-50%) scale(1.25)}}
 .ldc{display:flex;align-items:center;gap:10px;margin:10px 0}.lms{flex:1;font-size:14px;min-height:40px;display:flex;align-items:center}.ldc #lroll{flex:none;width:78px;margin:0;padding:9px 4px;font-size:13px;border-radius:999px;background:linear-gradient(180deg,#fde68a,#f59e0b);color:#451a03;box-shadow:0 3px 0 #b45309}
-/* Ludo side layout: dice dock moves above/below the board with the turn */
-.lucol{display:flex;flex-direction:column}.lucol #lplTop{order:0}.lucol #ldcRow{order:3}.lucol.dice-top #ldcRow{order:1}.lucol #ldb{order:2}.lucol #lplBot{order:4}.lucol #lquit{order:5}.lucol #lres{order:6}
-.dice{width:92px;height:92px;flex:none;border-radius:20px;border:3px solid #ffd23f;box-shadow:0 6px 0 rgba(0,0,0,.4),0 12px 20px rgba(0,0,0,.45),inset 0 3px 8px rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.35);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:10px;gap:2px}.dice u{border-radius:50%;background:transparent;margin:auto;width:15px;height:15px}.dice u.on{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,0) 55%),var(--dd,#111);box-shadow:0 1px 2px rgba(0,0,0,.55),inset 0 -2px 3px rgba(0,0,0,.35)}.dice.go{animation:tumble .5s ease-in-out infinite}@keyframes tumble{0%{transform:rotate(0) scale(1)}25%{transform:rotate(9deg) scale(1.07)}50%{transform:rotate(-9deg) scale(1.09)}75%{transform:rotate(6deg) scale(1.06)}100%{transform:rotate(0) scale(1)}}
+/* Ludo fixed layout: board never moves — top strip (bot panel + bot dice), board, message, bottom strip (player dice + player panel + ROLL) */
+.lucol{display:flex;flex-direction:column}
+.ldc.lustrip{display:flex;align-items:center;gap:8px;margin:6px 0}
+.lustrip .lpl{flex:1;min-width:0;margin:0}
+.lustrip .lp{font-size:10px;padding:5px 1px}
+.lustrip .lp span{font-size:16px}
+.lustrip .lp small{font-size:9px}
+.lms.lu-msg{flex:none;justify-content:center;text-align:center;min-height:24px;font-size:13px;margin:2px 0}
+/* Home: first-photo 3-column layout — small tiles left/right, big Carrom + Ludo centre, even smaller than the photo */
+.hgr{display:grid;grid-template-columns:1fr 1.55fr 1fr;gap:8px}
+.hgr .hcol{display:flex;flex-direction:column;gap:8px}
+.hgr .hcol .gt{flex:1}
+.hgr .hcol .gt:not(.big){display:flex;flex-direction:column;align-items:center;justify-content:center}
+.hgr .gt{padding:6px 2px;font-size:11px}
+.hgr .gt span{font-size:20px}
+.hgr .gt small{font-size:10px}
+.hgr .gt.big{font-size:14px;padding:8px 6px}
+.hgr .gt.big span{font-size:26px}
+.dice{width:72px;height:72px;flex:none;border-radius:20px;border:3px solid #ffd23f;box-shadow:0 6px 0 rgba(0,0,0,.4),0 12px 20px rgba(0,0,0,.45),inset 0 3px 8px rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.35);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:7px;gap:2px}.dice u{border-radius:50%;background:transparent;margin:auto;width:12px;height:12px}.dice.dim{opacity:.45}.dice.act{box-shadow:0 0 0 3px #ffd23f,0 0 18px rgba(255,210,63,.8),0 6px 0 rgba(0,0,0,.4),0 12px 20px rgba(0,0,0,.45),inset 0 3px 8px rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.35)}.dice u.on{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,0) 55%),var(--dd,#111);box-shadow:0 1px 2px rgba(0,0,0,.55),inset 0 -2px 3px rgba(0,0,0,.35)}.dice.go{animation:tumble .5s ease-in-out infinite}@keyframes tumble{0%{transform:rotate(0) scale(1)}25%{transform:rotate(9deg) scale(1.07)}50%{transform:rotate(-9deg) scale(1.09)}75%{transform:rotate(6deg) scale(1.06)}100%{transform:rotate(0) scale(1)}}
 [data-th=b]{--bbg:#dbeafe}[data-th=r]{--bbg:#ffe4e6}[data-th=k]{--bbg:#3f3f46}
 
 .ccn{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
@@ -184,14 +200,14 @@ document.querySelectorAll('#nv button').forEach(b=>b.onclick=()=>go(b.dataset.t)
 function home(){const v=vipOn();
  $('mn').innerHTML=`<div style='display:flex;gap:8px;margin-bottom:10px'><button id='vpb' style='flex:1;border:0;border-radius:16px;padding:12px;background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;text-align:left;font-weight:800;font-size:15px;box-shadow:0 4px 0 rgba(0,0,0,.2)'><span style='font-size:26px;vertical-align:middle'>👑</span> <span style='vertical-align:middle'>VIP Pass · 30 days</span><small style='display:block;font-weight:600;opacity:.9;font-size:11px;margin-top:2px'>${v?'Active until '+new Date(S.vip).toLocaleDateString():'Verified badge + Gold striker'}</small></button>
 <button class='gt' id='shp' style='flex:none;width:84px;background:linear-gradient(135deg,#a855f7,#7c3aed)'><span>🛍️</span>Shop</button></div>
-<div class='gr'><button class='gt big' data-g='carrom' style='background:linear-gradient(135deg,#92400e,#f59e0b)'><span>🎯</span><div>CARROM<small>Practice free or enter the Challenge</small></div></button>
-<button class='gt big' data-g='ludo' style='background:linear-gradient(135deg,#ef4444,#f59e0b)'><span>🎲</span><div>LUDO<small>1v1 · 2v2 · friends</small></div></button>
-<button class='gt' data-g='mm' style='background:linear-gradient(135deg,#11998e,#38ef7d)'><span>🧠</span>Memory Match<small>Free · win coins</small></button>
+<div class='hgr'><div class='hcol'><button class='gt' data-g='mm' style='background:linear-gradient(135deg,#11998e,#38ef7d)'><span>🧠</span>Memory Match<small>Free · win coins</small></button>
 <button class='gt' data-g='g24' style='background:linear-gradient(135deg,#f7971e,#ffd200);color:#3b1d00'><span>🔢</span>2048<small>Free · win coins</small></button>
-<button class='gt' data-g='sn' style='background:linear-gradient(135deg,#56ab2f,#a8e063);color:#173b00'><span>🐍</span>Snake<small>Free · win coins</small></button>
+<button class='gt' data-f='yt' style='background:linear-gradient(135deg,#ef4444,#b91c1c)'><span>▶️</span>YouTube<small>${S.f.yt?'✓ Joined':'+50 🪙'}</small></button></div>
+<div class='hcol'><button class='gt big' data-g='carrom' style='background:linear-gradient(135deg,#92400e,#f59e0b)'><span>🎯</span><div>CARROM<small>Practice free or enter the Challenge</small></div></button>
+<button class='gt big' data-g='ludo' style='background:linear-gradient(135deg,#ef4444,#f59e0b)'><span>🎲</span><div>LUDO<small>1v1 · 2v2 · friends</small></div></button></div>
+<div class='hcol'><button class='gt' data-g='sn' style='background:linear-gradient(135deg,#56ab2f,#a8e063);color:#173b00'><span>🐍</span>Snake<small>Free · win coins</small></button>
 <button class='gt' data-g='tt' style='background:linear-gradient(135deg,#4776e6,#8e54e9)'><span>⭕❌</span>Tic-Tac-Toe<small>Free · beat the bot</small></button>
-<button class='gt' data-f='yt' style='background:linear-gradient(135deg,#ef4444,#b91c1c)'><span>▶️</span>YouTube<small>${S.f.yt?'✓ Joined':'+50 🪙'}</small></button>
-<button class='gt' data-f='wa' style='background:linear-gradient(135deg,#22c55e,#15803d)'><span>💬</span>WhatsApp<small>${S.f.wa?'✓ Joined':'+50 🪙'}</small></button></div>
+<button class='gt' data-f='wa' style='background:linear-gradient(135deg,#22c55e,#15803d)'><span>💬</span>WhatsApp<small>${S.f.wa?'✓ Joined':'+50 🪙'}</small></button></div></div>
 <div style='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px'><button class='gt' data-s='spin' style='background:#ede9fe;color:#4c1d95'><span>🎡</span>Spin</button><button class='gt' data-s='ci' style='background:#ede9fe;color:#4c1d95'><span>📅</span>Check-in</button><button class='gt' data-s='mis' style='background:#ede9fe;color:#4c1d95'><span>🎯</span>Missions</button><button class='gt' data-s='chips' style='background:#ede9fe;color:#4c1d95'><span>♠</span>Free chips</button></div>
 <p class='ft'>Games are free to play. Coins can be converted to PKR in the Wallet.</p>`;
  $('vpb').onclick=()=>openGame('shop');$('shp').onclick=()=>openGame('shop');
@@ -366,18 +382,18 @@ function ludo(){const c=$('gc');let mode=2;
  render()}
 function luStart(mode,table){
  if(table=='rs'){if(S.pkr<50)return;S.pkr-=50;save();hdr()}
- const cols=mode==2?['R','Y']:mode==3?['R','G','Y']:['R','G','Y','B']; // 2P: opponent is diagonally-opposite Yellow, so the two players enter the track from opposite sides
+ const cols=mode==2?['B','G']:mode==3?['R','G','Y']:['R','G','Y','B']; // 2P: player is BLUE (bottom-left base), bot is GREEN (top-right base) — still diagonally opposite
  LU={gid:++LUGID,players:cols.map((k,i)=>({color:k,name:i==0?(S.nm||'You'):LU_NAME[k]+' Bot',isBot:i>0,tokens:[0,0,0,0]})),turn:0,dice:0,rolled:false,moving:false,over:false,table:table,mode:mode,skin:S.ludoSkin||'classic',movable:[],canRoll:false};
  const c=$('gc');
- c.innerHTML=`<div class='lucol dice-bot' id='lucol'>
- <div class='lpl' id='lplTop'></div>
+ c.innerHTML=`<div class='lucol' id='lucol'>
+ <div class='ldc lustrip' id='ldcTop'><div class='lpl' id='lplTop'></div><div class='dice' id='ldiceTop'></div></div>
  <div class='ldb' id='ldb'></div>
- <div class='lpl' id='lplBot'></div>
- <div class='ldc' id='ldcRow'><div class='dice' id='ldice'></div><div class='lms' id='lms'>Tap ROLL to start</div><button class='b' id='lroll'>🎲 ROLL</button></div>
+ <div class='lms lu-msg' id='lms'>Tap ROLL to start</div>
+ <div class='ldc lustrip' id='ldcBot'><div class='dice' id='ldiceBot'></div><div class='lpl' id='lplBot'></div><button class='b' id='lroll'>🎲 ROLL</button></div>
  <button class='b back' id='lquit'>🏳️ Quit</button>
  <div id='lres'></div></div>`;
- luBuildBoard();luMakeTokens();luSetDice(6,LU.skin);luStrip();
- $('lroll').onclick=()=>luRollAttempt();$('ldice').onclick=()=>luRollAttempt();
+ luBuildBoard();luMakeTokens();luSetDice(6,LU.skin,$('ldiceTop'),false);luSetDice(6,LU.skin,$('ldiceBot'),true);luStrip();
+ $('lroll').onclick=()=>luRollAttempt();$('ldiceBot').onclick=()=>luRollAttempt();
  $('lquit').onclick=()=>luQuit();
  luTurn()}
 function luBuildBoard(){const b=$('ldb');if(!b)return;let h='';
@@ -400,7 +416,7 @@ function luPawnSVG(color,skin,uid){const t=LU_TONE[color],g=LU_GOLD;
  const body=t[1],dark=t[2],light=t[0]; // pawn body is ALWAYS the player's own color — skins only add accents
  const med=skin=='chip'?['#1e293b','#ffd23f','♠']:skin=='gold'?['#ffffff',t[1],'★']:skin=='royal'?['#ffffff','#b45309','₹']:null;
  const ring=(skin=='gold'||skin=='royal')?'#ffd23f':'#ffffff'; // gold trim ring for Gold + Royal skins
- return `<svg viewBox='0 0 100 100'><defs><linearGradient id='pg${uid}' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${light}'/><stop offset='.55' stop-color='${body}'/><stop offset='1' stop-color='${dark}'/></linearGradient></defs><ellipse cx='50' cy='88' rx='36' ry='10' fill='${ring}' stroke='rgba(0,0,0,.3)' stroke-width='2'/><path d='M50 26 C62 36 67 50 69 64 C70 76 66 84 50 84 C34 84 30 76 31 64 C33 50 38 36 50 26 Z' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><circle cx='50' cy='20' r='14' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><ellipse cx='43' cy='14' rx='5' ry='3.5' fill='rgba(255,255,255,.85)' transform='rotate(-20 43 14)'/>${med?`<circle cx='50' cy='60' r='13' fill='${med[0]}' stroke='rgba(0,0,0,.25)' stroke-width='1.5'/><text x='50' y='66' text-anchor='middle' font-size='16' font-weight='900' fill='${med[1]}'>${med[2]}</text>`:''}</svg>`}
+ return `<svg viewBox='0 0 100 100'><defs><linearGradient id='pg${uid}' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${light}'/><stop offset='.55' stop-color='${body}'/><stop offset='1' stop-color='${dark}'/></linearGradient></defs><ellipse cx='50' cy='88' rx='36' ry='10' fill='${ring}' stroke='rgba(0,0,0,.3)' stroke-width='2'/><path d='M50 26 C62 36 67 50 69 64 C70 76 66 84 50 84 C34 84 30 76 31 64 C33 50 38 36 50 26 Z' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><circle cx='50' cy='20' r='14' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><ellipse cx='43' cy='14' rx='5' ry='3.5' fill='rgba(255,255,255,.85)' transform='rotate(-20 43 14)'/><ellipse cx='39' cy='56' rx='8' ry='13' fill='rgba(255,255,255,.32)' transform='rotate(-16 39 56)'/>${med?`<circle cx='50' cy='60' r='13' fill='${med[0]}' stroke='rgba(0,0,0,.25)' stroke-width='1.5'/><text x='50' y='66' text-anchor='middle' font-size='16' font-weight='900' fill='${med[1]}'>${med[2]}</text>`:''}</svg>`}
 function luMakeTokens(){const b=$('ldb');if(!b)return;
  LU.players.forEach((pl,pi)=>{pl.tokens.forEach((_,ti)=>{const el=document.createElement('div');el.className='tk';el.id='ltk-'+pi+'-'+ti;
   el.innerHTML=luPawnSVG(pl.color,LU.skin,pi+'-'+ti);
@@ -418,37 +434,47 @@ function luRenderTokens(){if(!LU)return;const groups={};
   if(p===57){l+=ti%2?2.6:-2.6;t+=ti<2?-2.6:2.6}
   else if(g.length>1){l+=(n-(g.length-1)/2)*2.4}
   el.style.left=l+'%';el.style.top=t+'%'})})}
+function luSideOf(pl){if(!pl.isBot)return 'bottom';if(LU.mode===2)return 'top';return pl.color==='G'?'top':'bottom'} // 2P: the single bot sits opposite (top); 3P/4P: Green on top as before
+function luDiceFor(side){return{el:side==='top'?$('ldiceTop'):$('ldiceBot'),blue:side==='bottom'}} // bottom strip = player's side = BLUE die; top strip = bot's side = WHITE die
+function luSyncRoll(){const r=$('lroll');if(!r)return;r.disabled=!(LU&&!LU.over&&LU.players[LU.turn]&&!LU.players[LU.turn].isBot&&LU.canRoll)}
 function luStrip(){if(!LU)return;
- const side=pl=>{if(!pl.isBot)return 'bottom';if(LU.mode===2)return 'top';return pl.color==='G'?'top':'bottom'}; // 2P: the single bot sits opposite (top); 3P/4P: Green on top as before
+ const side=luSideOf;
  const top=LU.players.filter(pl=>side(pl)==='top'),bot=LU.players.filter(pl=>side(pl)==='bottom');
  const html=list=>list.map(pl=>{const pi=LU.players.indexOf(pl),home=pl.tokens.filter(p=>p===57).length,out=pl.tokens.filter(p=>p>=1&&p<57).length;
   return `<div class='lp ${LU.turn==pi&&!LU.over?'on':''}' style='--c:${LU_COLOR[pl.color]}'><span>${pl.isBot?'🤖':'👤'}</span><b>${pl.name}</b><small>${home}/4 home · ${out} out</small></div>`}).join('');
  const t=$('lplTop'),b=$('lplBot');
  if(t){t.innerHTML=html(top);t.style.display=top.length?'grid':'none';t.style.gridTemplateColumns=`repeat(${Math.max(top.length,1)},1fr)`}
  if(b){b.innerHTML=html(bot);b.style.display=bot.length?'grid':'none';b.style.gridTemplateColumns=`repeat(${Math.max(bot.length,1)},1fr)`}
- const col=$('lucol');if(col){const actTop=LU.players[LU.turn]&&side(LU.players[LU.turn])==='top';col.classList.toggle('dice-top',!!actTop);col.classList.toggle('dice-bot',!actTop)}}
+ // fixed dice: the active side's die glows, the other is dimmed and keeps its last value — the board never moves
+ const act=LU.players[LU.turn]?side(LU.players[LU.turn]):'bottom';
+ const dt=$('ldiceTop'),db=$('ldiceBot');
+ if(dt){dt.classList.toggle('dim',LU.over||act!=='top');dt.classList.toggle('act',!LU.over&&act==='top')}
+ if(db){db.classList.toggle('dim',LU.over||act!=='bottom');db.classList.toggle('act',!LU.over&&act==='bottom')}
+ luSyncRoll()}
 const LU_PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
-function luSetDice(v,skin){const d=$('ldice');if(!d)return;
- d.innerHTML=Array.from({length:9},(_,i)=>{const on=LU_PIPS[v].includes(i);const red=on&&skin=='classic'&&v==1&&i==4;return `<u class='${on?'on':''}'${red?" style='--dd:#dc2626'":''}></u>`}).join('');
- const st={classic:'--dd:#1e40af;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#ffffff,#f8fafc 40%,#e2e8f0 72%,#cbd5e1)',chip:'--dd:#ffd23f;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#64748b,#0f172a 55%,#020617)',gold:'--dd:#451a03;border-color:#fff7cc;background:radial-gradient(circle at 30% 25%,#fef9c3,#f59e0b 55%,#b45309)',royal:'--dd:#7f1d1d;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#fde68a,#d97706 50%,#92400e)'};
+const LU_PIP_COLORS=['#ef4444','#f59e0b','#22c55e','#ec4899','#dc2626','#14b8a6','#a855f7','#fb923c','#eab308']; // colorful pips — readable on both the blue and the white die (centre pip stays red, like the old red 1-pip)
+function luSetDice(v,skin,el,blue){const d=el||null;if(!d)return;
+ d.innerHTML=Array.from({length:9},(_,i)=>{const on=LU_PIPS[v].includes(i);const col=on&&skin=='classic'?LU_PIP_COLORS[i]:null;return `<u class='${on?'on':''}'${col?` style='--dd:${col}'`:''}></u>`}).join('');
+ const st={classic:blue?'--dd:#ffffff;border-color:#3b82f6;background:radial-gradient(circle at 30% 25%,#60a5fa,#2563eb 55%,#1e40af)':'--dd:#1e40af;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#ffffff,#f8fafc 40%,#e2e8f0 72%,#cbd5e1)',chip:'--dd:#ffd23f;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#64748b,#0f172a 55%,#020617)',gold:'--dd:#451a03;border-color:#fff7cc;background:radial-gradient(circle at 30% 25%,#fef9c3,#f59e0b 55%,#b45309)',royal:'--dd:#7f1d1d;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#fde68a,#d97706 50%,#92400e)'};
  d.style.cssText=st[skin]||st.classic}
-function luRollAnim(final,cb){const d=$('ldice');const g=LU?LU.gid:0;if(d)d.classList.add('go');let n=0;
- const t=setInterval(()=>{if(!LU||LU.gid!==g||!$('ldice')){clearInterval(t);return}luSetDice(1+Math.floor(Math.random()*6),LU.skin);
-  if(++n>=7){clearInterval(t);if(d)d.classList.remove('go');luSetDice(final,LU.skin);if(LU&&LU.gid===g)cb()}},70)}
+function luRollAnim(final,cb,el,blue){const d=el;const g=LU?LU.gid:0;if(d)d.classList.add('go');let n=0;
+ const t=setInterval(()=>{if(!LU||LU.gid!==g||!d||!d.isConnected){clearInterval(t);return}luSetDice(1+Math.floor(Math.random()*6),LU.skin,d,blue);
+  if(++n>=7){clearInterval(t);if(d)d.classList.remove('go');luSetDice(final,LU.skin,d,blue);if(LU&&LU.gid===g)cb()}},70)}
 function luBiasedDie(isBot){const p=isBot?LU_DICE_BIAS.bot6:LU_DICE_BIAS.player6;if(Math.random()<p)return 6;return 1+Math.floor(Math.random()*5)}
 function luMsg(t){const m=$('lms');if(m)m.innerHTML=t}
-function luTurn(){if(!LU||LU.over)return;const pl=LU.players[LU.turn];luStrip();LU.rolled=false;LU.canRoll=!pl.isBot;
+function luTurn(){if(!LU||LU.over)return;const pl=LU.players[LU.turn];LU.rolled=false;LU.canRoll=!pl.isBot;luStrip();
  luMsg(pl.isBot?`🤖 ${pl.name} is playing…`:`👆 Your turn — tap ROLL`);
  if(pl.isBot)lgo(()=>{if(!LU||LU.over)return;luRoll(true)},700)}
 function luRollAttempt(){if(!LU||LU.over||LU.moving)return;const pl=LU.players[LU.turn];
- if(pl.isBot||!LU.canRoll)return;LU.canRoll=false;luRoll(false)}
+ if(pl.isBot||!LU.canRoll)return;LU.canRoll=false;luSyncRoll();luRoll(false)}
 function luRoll(isBot){if(!LU||LU.over)return;const pl=LU.players[LU.turn];
  const v=luBiasedDie(isBot);LU.dice=v;LU.rolled=true;beep(600);
+ const dd=luDiceFor(luSideOf(pl)); // the current player's own side die rolls — it never changes place
  luRollAnim(v,()=>{if(!LU||LU.over)return;const legal=luLegal(pl.tokens,v);
   if(!legal.length){luMsg(`🎲 ${v} — no move possible. Turn passes.`);beep(200);lgo(()=>luEndTurn(),1100);return}
   if(pl.isBot){lgo(()=>{if(!LU||LU.over)return;const ti=luBotPick(LU.players,LU.turn,v);if(ti>=0)luMove(ti);else luEndTurn()},600)}
   else if(legal.length===1){luMsg(`🎲 You rolled ${v} — only one move, moving it!`);lgo(()=>{if(!LU||LU.over)return;luMove(legal[0])},500)}
-  else{luMsg(`🎲 You rolled ${v} — tap a glowing token`);luHighlight(legal)}})}
+  else{luMsg(`🎲 You rolled ${v} — tap a glowing token`);luHighlight(legal)}},dd.el,dd.blue)}
 function luHighlight(legal){LU.movable=legal;legal.forEach(ti=>{const el=$('ltk-0-'+ti);if(el){el.classList.add('mv');el.onclick=()=>luMove(ti)}})}
 function luClearHighlight(){if(!LU)return;(LU.movable||[]).forEach(ti=>{const el=$('ltk-0-'+ti);if(el){el.classList.remove('mv');el.onclick=null}});LU.movable=[]}
 function luMove(ti){if(!LU||LU.over||LU.moving)return;const pl=LU.players[LU.turn],d=LU.dice,g=LU.gid;
@@ -465,7 +491,7 @@ function luMove(ti){if(!LU||LU.over||LU.moving)return;const pl=LU.players[LU.tur
   luRenderTokens();luStrip();
   if(pl.tokens.every(p=>p===57)){luEnd(LU.turn,false);return}
   if(msg)luMsg(msg);
-  if(d===6){LU.canRoll=!pl.isBot;if(pl.isBot){luMsg('🎲 Rolled a 6 — rolling again…');lgo(()=>luRoll(true),700)}else luMsg('🎲 You rolled a 6 — tap ROLL again!');return}
+  if(d===6){LU.canRoll=!pl.isBot;luSyncRoll();if(pl.isBot){luMsg('🎲 Rolled a 6 — rolling again…');lgo(()=>luRoll(true),700)}else luMsg('🎲 You rolled a 6 — tap ROLL again!');return}
   lgo(()=>luEndTurn(),msg?900:350)};
  stepFn()}
 function luEndTurn(){if(!LU||LU.over)return;LU.turn=(LU.turn+1)%LU.players.length;LU.rolled=false;LU.dice=0;luTurn()}
