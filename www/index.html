@@ -341,7 +341,7 @@ function luBotPick(players,pi,d){const me=players[pi],legal=luLegal(me.tokens,d)
   if(s>bs){bs=s;best=ti}}
  return best}
 // LU-PURE-END
-const LU_SKINS={classic:{name:'Classic',price:0,cur:'coins',desc:'Original Ludo tokens'},chip:{name:'Chip ♠',price:100,cur:'chips',desc:'Fancy chip tokens'},gold:{name:'Gold',price:250,cur:'chips',desc:'Shiny gold tokens'},royal:{name:'Rs Royal',price:5,cur:'pkr',desc:'Rs tokens + gold dice'}};
+const LU_SKINS={classic:{name:'Classic',price:0,cur:'coins',desc:'Original Ludo tokens'},chip:{name:'Chip ♠',price:100,cur:'chips',desc:'Fancy chip tokens'},gold:{name:'Gold',price:250,cur:'chips',desc:'Gold trim on your color tokens'},royal:{name:'Rs Royal',price:5,cur:'pkr',desc:'Rs tokens + gold dice'}};
 let LU=null,LUGID=0;
 const lgo=(fn,ms)=>{const g=LU?LU.gid:0;setTimeout(()=>{if(LU&&LU.gid===g&&$('gc')&&$('gs').style.display!=='none')fn()},ms)};
 function ludo(){const c=$('gc');let mode=2;
@@ -366,7 +366,7 @@ function ludo(){const c=$('gc');let mode=2;
  render()}
 function luStart(mode,table){
  if(table=='rs'){if(S.pkr<50)return;S.pkr-=50;save();hdr()}
- const cols=mode==2?['R','G']:mode==3?['R','G','Y']:['R','G','Y','B'];
+ const cols=mode==2?['R','Y']:mode==3?['R','G','Y']:['R','G','Y','B']; // 2P: opponent is diagonally-opposite Yellow, so the two players enter the track from opposite sides
  LU={gid:++LUGID,players:cols.map((k,i)=>({color:k,name:i==0?(S.nm||'You'):LU_NAME[k]+' Bot',isBot:i>0,tokens:[0,0,0,0]})),turn:0,dice:0,rolled:false,moving:false,over:false,table:table,mode:mode,skin:S.ludoSkin||'classic',movable:[],canRoll:false};
  const c=$('gc');
  c.innerHTML=`<div class='lucol dice-bot' id='lucol'>
@@ -397,9 +397,9 @@ function luBuildBoard(){const b=$('ldb');if(!b)return;let h='';
 const LU_TONE={R:['#fca5a5','#ef4444','#991b1b'],G:['#86efac','#22c55e','#166534'],Y:['#fde047','#eab308','#854d0e'],B:['#93c5fd','#3b82f6','#1e40af']};
 const LU_GOLD=['#fef9c3','#f59e0b','#92400e'];
 function luPawnSVG(color,skin,uid){const t=LU_TONE[color],g=LU_GOLD;
- const body=skin=='gold'?g[1]:t[1],dark=skin=='gold'?g[2]:t[2],light=skin=='gold'?g[0]:t[0];
+ const body=t[1],dark=t[2],light=t[0]; // pawn body is ALWAYS the player's own color — skins only add accents
  const med=skin=='chip'?['#1e293b','#ffd23f','♠']:skin=='gold'?['#ffffff',t[1],'★']:skin=='royal'?['#ffffff','#b45309','₹']:null;
- const ring=skin=='royal'?'#ffd23f':'#ffffff';
+ const ring=(skin=='gold'||skin=='royal')?'#ffd23f':'#ffffff'; // gold trim ring for Gold + Royal skins
  return `<svg viewBox='0 0 100 100'><defs><linearGradient id='pg${uid}' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${light}'/><stop offset='.55' stop-color='${body}'/><stop offset='1' stop-color='${dark}'/></linearGradient></defs><ellipse cx='50' cy='88' rx='36' ry='10' fill='${ring}' stroke='rgba(0,0,0,.3)' stroke-width='2'/><path d='M50 26 C62 36 67 50 69 64 C70 76 66 84 50 84 C34 84 30 76 31 64 C33 50 38 36 50 26 Z' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><circle cx='50' cy='20' r='14' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><ellipse cx='43' cy='14' rx='5' ry='3.5' fill='rgba(255,255,255,.85)' transform='rotate(-20 43 14)'/>${med?`<circle cx='50' cy='60' r='13' fill='${med[0]}' stroke='rgba(0,0,0,.25)' stroke-width='1.5'/><text x='50' y='66' text-anchor='middle' font-size='16' font-weight='900' fill='${med[1]}'>${med[2]}</text>`:''}</svg>`}
 function luMakeTokens(){const b=$('ldb');if(!b)return;
  LU.players.forEach((pl,pi)=>{pl.tokens.forEach((_,ti)=>{const el=document.createElement('div');el.className='tk';el.id='ltk-'+pi+'-'+ti;
@@ -419,7 +419,7 @@ function luRenderTokens(){if(!LU)return;const groups={};
   else if(g.length>1){l+=(n-(g.length-1)/2)*2.4}
   el.style.left=l+'%';el.style.top=t+'%'})})}
 function luStrip(){if(!LU)return;
- const side=pl=>pl.isBot?(pl.color==='G'?'top':'bottom'):'bottom';
+ const side=pl=>{if(!pl.isBot)return 'bottom';if(LU.mode===2)return 'top';return pl.color==='G'?'top':'bottom'}; // 2P: the single bot sits opposite (top); 3P/4P: Green on top as before
  const top=LU.players.filter(pl=>side(pl)==='top'),bot=LU.players.filter(pl=>side(pl)==='bottom');
  const html=list=>list.map(pl=>{const pi=LU.players.indexOf(pl),home=pl.tokens.filter(p=>p===57).length,out=pl.tokens.filter(p=>p>=1&&p<57).length;
   return `<div class='lp ${LU.turn==pi&&!LU.over?'on':''}' style='--c:${LU_COLOR[pl.color]}'><span>${pl.isBot?'🤖':'👤'}</span><b>${pl.name}</b><small>${home}/4 home · ${out} out</small></div>`}).join('');
