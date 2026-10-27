@@ -111,7 +111,7 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(
 .lustrip .lp span{font-size:16px}
 .lustrip .lp small{font-size:9px}
 .lms.lu-msg{flex:none;justify-content:center;text-align:center;min-height:24px;font-size:13px;margin:2px 0}
-/* Home: first-photo 3-column layout — small tiles left/right, big Carrom + Ludo centre, even smaller than the photo */
+/* Home: first-photo 3-column layout — small tiles left/right, big Mines + Ludo centre, even smaller than the photo */
 .hgr{display:grid;grid-template-columns:1fr 1.55fr 1fr;gap:8px}
 .hgr .hcol{display:flex;flex-direction:column;gap:8px}
 .hgr .hcol .gt{flex:1}
@@ -124,9 +124,14 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(
 .dice{width:72px;height:72px;flex:none;border-radius:20px;border:3px solid #ffd23f;box-shadow:0 6px 0 rgba(0,0,0,.4),0 12px 20px rgba(0,0,0,.45),inset 0 3px 8px rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.35);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:7px;gap:2px}.dice u{border-radius:50%;background:transparent;margin:auto;width:12px;height:12px}.dice.dim{opacity:.45}.dice.act{box-shadow:0 0 0 3px #ffd23f,0 0 18px rgba(255,210,63,.8),0 6px 0 rgba(0,0,0,.4),0 12px 20px rgba(0,0,0,.45),inset 0 3px 8px rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.35)}.dice u.on{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,0) 55%),var(--dd,#111);box-shadow:0 1px 2px rgba(0,0,0,.55),inset 0 -2px 3px rgba(0,0,0,.35)}.dice.go{animation:tumble .5s ease-in-out infinite}@keyframes tumble{0%{transform:rotate(0) scale(1)}25%{transform:rotate(9deg) scale(1.07)}50%{transform:rotate(-9deg) scale(1.09)}75%{transform:rotate(6deg) scale(1.06)}100%{transform:rotate(0) scale(1)}}
 [data-th=b]{--bbg:#dbeafe}[data-th=r]{--bbg:#ffe4e6}[data-th=k]{--bbg:#3f3f46}
 
-.ccn{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
-.cvx{width:100%;display:block;border-radius:16px;touch-action:none;box-shadow:0 8px 0 rgba(0,0,0,.3),0 0 0 6px #7c4a1a}
-.rg{padding:0!important;border:0!important;background:none!important;accent-color:#ffd23f;margin:4px 0 10px!important}.lb2{font-size:13px;opacity:.8;display:block;margin-top:12px}
+.mng{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0}
+.mng.shake{animation:mnsh .4s}
+@keyframes mnsh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.mnb{aspect-ratio:1;border:0;border-radius:12px;background:linear-gradient(135deg,#4c1d95,#7c3aed);color:#fff;font-size:20px;font-weight:900;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+.mnb:disabled{opacity:.55}
+.mnb.open{background:#fff;color:#111827}
+.mnb.mine{background:#dc2626}
+.mnb.hint{background:linear-gradient(135deg,#ffd23f,#f59e0b);color:#3b1d00}
 .ww{position:relative;width:300px;margin:14px auto 0}
 .wh{position:relative;width:280px;height:280px;margin:0 auto;border-radius:50%;border:8px solid #ffd23f;box-shadow:0 0 0 4px #92400e,0 12px 30px rgba(0,0,0,.5);overflow:hidden}
 .wd{position:absolute;inset:0;border-radius:50%}
@@ -136,14 +141,20 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(
 .spb{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;border:4px solid rgba(255,255,255,.35);background:radial-gradient(circle at 35% 30%,#fef9c3,#f59e0b 60%,#b45309);color:#451a03;font-size:19px;font-weight:900;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.5);cursor:pointer}
 .spb:disabled{opacity:.8}
 .spt{margin-top:14px;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-weight:700;border-radius:12px;padding:10px;font-size:15px}
+/* Home fill: spread sections down the screen so no big white gap is left */
+.hm{display:flex;flex-direction:column;justify-content:space-evenly;min-height:calc(100vh - 200px);min-height:calc(100dvh - 200px)}
+/* VIP Pass banner — full width, solid blue, big white VIP PASS */
+.vipb{border:0;border-radius:20px;padding:16px 12px;background:#1565C0;color:#fff;text-align:center;box-shadow:0 6px 0 rgba(0,0,0,.25);width:100%;cursor:pointer}
+.vipb b{display:block;font-size:26px;font-weight:900;letter-spacing:2px;color:#fff}
+.vipb small{display:block;font-weight:700;opacity:.92;font-size:13px;margin-top:4px;color:#fff}
 </style></head><body>
 <header id="hd"></header><main id="mn"></main>
-<nav id="nv"><button data-t="home">🏠 Home</button><button data-t="earn">🎁 Earn</button><button data-t="vids">🎬 Videos</button><button data-t="inv">🤝 Invite</button><button data-t="wal">👛 Wallet</button></nav>
+<nav id="nv"><button data-t="home">🏠 Home</button><button data-t="mis">🎯 Missions</button><button data-t="vids">🎬 Videos</button><button data-t="inv">🤝 Invite</button><button data-t="wal">👛 Wallet</button></nav>
 <div id="gs"></div><div class="mo" id="mo"></div>
 <script>
 const CFG={yt:'https://youtube.com/@earningdecode-786',wa:'https://whatsapp.com/channel/0029VbDkN2e2975KAjrMOS1W',app:'',follow:50,adC:10,vidC:10,vidS:60,refB:200,frB:50,dayCap:40,per:50,minWd:300,chipPer:10,
  vids:[['Earn Free Earning App','https://youtu.be/sT8AXNebG8Y'],...Array.from({length:9},(_,i)=>['Video '+(i+2),''])]};
-const DEF=()=>({own:{av:[],th:[]},vip:0,theme:'g',dchip:'',ludoSkins:['classic'],ludoSkin:'classic',coins:50,chips:500,pkr:0,wd:[],acc:{m:'JazzCash',t:'',n:''},nm:'Player',av:'🦁',snd:true,spin:0,ci:'',stk:0,ads:0,vw:{},f:{},rc:'',used:'',st:{},cl:{},de:{d:'',n:0}});
+const DEF=()=>({own:{av:[],th:[]},vip:0,theme:'g',dchip:'',ludoSkins:['classic'],ludoSkin:'classic',coins:50,chips:500,pkr:0,mn_en:10,wd:[],acc:{m:'JazzCash',t:'',n:''},nm:'Player',av:'🦁',snd:true,spin:0,ci:'',stk:0,ads:0,vw:{},f:{},rc:'',used:'',st:{},cl:{},de:{d:'',n:0}});
 let S=DEF(),UID=null,curG='';try{UID=localStorage.getItem('rg_sess')}catch(e){}
 const key=()=>UID?'rg_'+UID:'rg';
 function loadS(){S=DEF();try{Object.assign(S,JSON.parse(localStorage.getItem(key())||'{}'))}catch(e){}if(!S.rc)S.rc='RG'+Math.random().toString(36).slice(2,7).toUpperCase().padEnd(5,'X')}
@@ -195,30 +206,31 @@ function lm(u){const m=$('mo');m.style.display='flex';m.innerHTML=`<div class='m
 const chk=u=>setTimeout(()=>{if(!document.hidden)lm(u)},1500);
 // ---- navigation ----
 let tab='home',scr='hub';
-function go(t){tab=t;if(t!='earn')scr='hub';document.querySelectorAll('#nv button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));({home,earn,vids,wal,inv})[t]();hdr();window.scrollTo(0,0)}
+function go(t){tab=t;if(t!='earn')scr='hub';document.querySelectorAll('#nv button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));({home,mis:missions,earn,vids,wal,inv})[t]();hdr();window.scrollTo(0,0)}
 document.querySelectorAll('#nv button').forEach(b=>b.onclick=()=>go(b.dataset.t));
-function home(){const v=vipOn();
- $('mn').innerHTML=`<div style='display:flex;gap:8px;margin-bottom:10px'><button id='vpb' style='flex:1;border:0;border-radius:16px;padding:12px;background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;text-align:left;font-weight:800;font-size:15px;box-shadow:0 4px 0 rgba(0,0,0,.2)'><span style='font-size:26px;vertical-align:middle'>👑</span> <span style='vertical-align:middle'>VIP Pass · 30 days</span><small style='display:block;font-weight:600;opacity:.9;font-size:11px;margin-top:2px'>${v?'Active until '+new Date(S.vip).toLocaleDateString():'Verified badge + Gold striker'}</small></button>
-<button class='gt' id='shp' style='flex:none;width:84px;background:linear-gradient(135deg,#a855f7,#7c3aed)'><span>🛍️</span>Shop</button></div>
+function home(){
+ $('mn').innerHTML=`<div class='hm'>
+ <button id='vpb' class='vipb'><b>👑 VIP PASS</b><small>Rs 500 · 30 days · Verified badge + Gold striker</small></button>
+ <button class='gt' id='shp' style='display:flex;align-items:center;justify-content:center;gap:10px;font-size:17px;padding:12px;background:linear-gradient(135deg,#a855f7,#7c3aed)'><span style='display:inline;font-size:22px;margin:0'>🛍️</span>Shop</button>
 <div class='hgr'><div class='hcol'><button class='gt' data-g='mm' style='background:linear-gradient(135deg,#11998e,#38ef7d)'><span>🧠</span>Memory Match<small>Free · win coins</small></button>
 <button class='gt' data-g='g24' style='background:linear-gradient(135deg,#f7971e,#ffd200);color:#3b1d00'><span>🔢</span>2048<small>Free · win coins</small></button>
 <button class='gt' data-f='yt' style='background:linear-gradient(135deg,#ef4444,#b91c1c)'><span>▶️</span>YouTube<small>${S.f.yt?'✓ Joined':'+50 🪙'}</small></button></div>
-<div class='hcol'><button class='gt big' data-g='carrom' style='background:linear-gradient(135deg,#92400e,#f59e0b)'><span>🎯</span><div>CARROM<small>Practice free or enter the Challenge</small></div></button>
+<div class='hcol'><button class='gt big' data-g='mines' style='background:linear-gradient(135deg,#1e3a8a,#3b82f6)'><span>💣</span><div>MINES<small>Find the 5 · win coins</small></div></button>
 <button class='gt big' data-g='ludo' style='background:linear-gradient(135deg,#ef4444,#f59e0b)'><span>🎲</span><div>LUDO<small>1v1 · 2v2 · friends</small></div></button></div>
 <div class='hcol'><button class='gt' data-g='sn' style='background:linear-gradient(135deg,#56ab2f,#a8e063);color:#173b00'><span>🐍</span>Snake<small>Free · win coins</small></button>
 <button class='gt' data-g='tt' style='background:linear-gradient(135deg,#4776e6,#8e54e9)'><span>⭕❌</span>Tic-Tac-Toe<small>Free · beat the bot</small></button>
 <button class='gt' data-f='wa' style='background:linear-gradient(135deg,#22c55e,#15803d)'><span>💬</span>WhatsApp<small>${S.f.wa?'✓ Joined':'+50 🪙'}</small></button></div></div>
-<div style='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px'><button class='gt' data-s='spin' style='background:#ede9fe;color:#4c1d95'><span>🎡</span>Spin</button><button class='gt' data-s='ci' style='background:#ede9fe;color:#4c1d95'><span>📅</span>Check-in</button><button class='gt' data-s='mis' style='background:#ede9fe;color:#4c1d95'><span>🎯</span>Missions</button><button class='gt' data-s='chips' style='background:#ede9fe;color:#4c1d95'><span>♠</span>Free chips</button></div>
-<p class='ft'>Games are free to play. Coins can be converted to PKR in the Wallet.</p>`;
+<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px'><button class='gt' data-s='spin' style='background:#ede9fe;color:#4c1d95'><span>🎡</span>Spin</button><button class='gt' data-s='ci' style='background:#ede9fe;color:#4c1d95'><span>📅</span>Check-in</button><button class='gt' data-s='chips' style='background:#ede9fe;color:#4c1d95'><span>♠</span>Free chips</button></div>
+<p class='ft'>Games are free to play. Coins can be converted to PKR in the Wallet.</p></div>`;
  $('vpb').onclick=()=>openGame('shop');$('shp').onclick=()=>openGame('shop');
  document.querySelectorAll('.gt[data-g]').forEach(b=>b.onclick=()=>openGame(b.dataset.g));
  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const k=b.dataset.f;if(S.f[k])return;stJ(k);chk(CFG[k]);setTimeout(()=>{if(tab=='home')home()},13000)});
  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{go('earn');scr=b.dataset.s;earn()})}
 // ---- game shell ----
-const GT={carrom:['🎯 Carrom',()=>carLobby()],ludo:['🎲 Ludo',()=>ludo()],mm:['🧠 Memory Match',()=>mmG()],g24:['🔢 2048',()=>g24()],sn:['🐍 Snake',()=>snake()],tt:['⭕❌ Tic-Tac-Toe',()=>ttt()],shop:['🛍 Shop',()=>shop()]};
+const GT={mines:['💣 Mines',()=>mines()],ludo:['🎲 Ludo',()=>ludo()],mm:['🧠 Memory Match',()=>mmG()],g24:['🔢 2048',()=>g24()],sn:['🐍 Snake',()=>snake()],tt:['⭕❌ Tic-Tac-Toe',()=>ttt()],shop:['🛍 Shop',()=>shop()]};
 let snT=null;
 function openGame(g){curG=g;const s=$('gs');s.style.display='block';s.innerHTML=`<div class='gh'><button class='ib' id='gb'>←</button><b>${GT[g][0]}</b><div class='cn' id='gc2'>${gcT()}</div></div><div id='gc'></div>`;$('gb').onclick=closeGame;GT[g][1]();window.scrollTo(0,0)}
-function closeGame(){clearInterval(snT);CA=null;curG='';$('gs').style.display='none';$('gs').innerHTML='';hdr();go(tab)}
+function closeGame(){clearInterval(snT);curG='';$('gs').style.display='none';$('gs').innerHTML='';hdr();go(tab)}
 // ---- Memory Match ----
 function mmG(){const e=['🍎','🍊','🍋','🍇','🍉','🍓','🥝','🍒'],d=[...e,...e].sort(()=>Math.random()-.5);let op=[],mv=0,dn=0,lk=false;const c=$('gc');
  c.innerHTML=`<p class='tc'>Match all pairs · Moves: <b id='mv'>0</b></p><div class='mg' id='mg'></div><div id='mr'></div>`;
@@ -254,80 +266,57 @@ function ttt(){const c=$('gc');let b=Array(9).fill(''),ov=false,res='';
  const fin=()=>{let m='';if(win(b,'X')){const g=earnG(6);stat('ttt');m=`🎉 You won! +${g} coins`}else if(win(b,'O'))m='😅 Bot won';else if(b.every(v=>v)){const g=earnG(1);m=`Draw · +${g} coin`}if(m){ov=true;res=m}return ov};
  const rd=()=>{c.innerHTML=`<p class='tc'>You are ❌ · Beat the bot!</p><div class='tg'>${b.map((v,i)=>`<button class='tc2' data-i='${i}'>${v=='X'?'❌':v=='O'?'⭕':''}</button>`).join('')}</div>${res?`<div class='cd tc'><h3>${res}</h3><button class='b' id='tn'>Play again</button></div>`:''}`;
   c.querySelectorAll('.tc2').forEach(k=>k.onclick=()=>{const i=+k.dataset.i;if(ov||b[i])return;b[i]='X';beep(500);if(!fin()){bot();fin()}rd()});if($('tn'))$('tn').onclick=ttt};rd()}
-// ---- Carrom ----
-const DSK={w:['#ffffff','#111111'],g:['#ffd23f','#3b1d00'],n:['#22d3ee','#083344']};
-const CW=360,PKT=[[15,15],[345,15],[15,345],[345,345]],RC=10.5,RS=14,FR=.985,BYU=302,BYB=58;
-const CTH={g:['#f0cf98','#d9a85f'],b:['#cfe3fb','#8fb8ea'],r:['#fde0e6','#f3a3b3'],k:['#6b6b75','#3f3f46']};
-let CA=null,CGID=0;
-const csay=t=>{const m=$('lms');if(m)m.innerHTML=t};
-const ct=(f,ms)=>{const g=CA&&CA.gid;setTimeout(()=>{if(CA&&CA.gid==g)f()},ms)};
-function cnew(){const cs=[],add=(x,y,t)=>cs.push({x,y,vx:0,vy:0,r:RC,t,on:true,m:1});add(180,180,'q');
- for(let i=0;i<6;i++){const a=i*Math.PI/3;add(180+Math.cos(a)*21.5,180+Math.sin(a)*21.5,i%2?'b':'w')}
- for(let i=0;i<12;i++){const a=i*Math.PI/6+Math.PI/12;add(180+Math.cos(a)*43,180+Math.sin(a)*43,i%2?'b':'w')}return cs}
-const crem=t=>CA.cs.filter(c=>c.on&&c.t==t).length;
-function ccnt(){const e=$('ccn');if(!e)return;e.innerHTML=`<div class='lp ${CA.turn=='you'?'on':''}' style='--c:#fff'><span>⚪</span><b>You</b><small>${crem('w')} coins left</small></div><div class='lp ${CA.turn=='bot'?'on':''}' style='--c:#222'><span>⚫</span><b>Bot</b><small>${crem('b')} coins left</small></div><div class='lp' style='--c:#dc2626'><span>👑</span><b>Queen</b><small>${CA.cs[0].on?'on board':'taken'}</small></div>`}
-function carLobby(){const c=$('gc');if(!c)return;CA=null;const td=new Date().toDateString(),n=S.chd&&S.chd.d==td?S.chd.n:0,ok=S.chips>=100&&n<5;
- c.innerHTML=`<div class='cd tc' style='background:linear-gradient(135deg,#92400e,#f59e0b);border:0;color:#fff'><h2>🎯 Carrom</h2><p>Choose a mode</p><p>You have <b>♠ ${S.chips}</b> chips · 🪙 ${S.coins} coins</p></div>
- <div class='cd'><h3>🎮 Practice</h3><p>Free to play. Win +12 coins (+2 for playing), within the daily game-reward limit.</p><button class='b p' id='cmod1'>Play free</button></div>
- <div class='cd' style='border-color:var(--g)'><h3>🏆 Challenge</h3><p>Entry <b>100 chips</b>. Win the match and get <b>+20 coins</b>. The bot is sharper here, so skill decides the winner.</p><p style='opacity:.75;font-size:12px'>Prizes today: ${n}/5 · Leaving mid-game loses the entry. Chips are free only: claim them in Earn → Free Chips. They cannot be bought or converted.</p><button class='b' id='cmod2' ${ok?'':'disabled'}>${S.chips<100?'Need 100 chips':n>=5?'Daily prize limit reached':'Enter · 100 chips'}</button>${S.chips<100?`<button class='b p' id='cmod3'>♠ Get free chips</button>`:''}</div>`;
- $('cmod1').onclick=()=>carrom('pr');if($('cmod2'))$('cmod2').onclick=()=>{S.chips-=100;save();hdr();carrom('ch')};if($('cmod3'))$('cmod3').onclick=()=>{closeGame();scr='chips';go('earn')}}
-function carrom(mode){const c=$('gc');CGID++;const own=(S.own.dice||[]).concat(vipOn()?['g']:[]),sk=DSK[S.dice&&own.includes(S.dice)?S.dice:'w'];
- CA={mode:mode||'pr',gid:CGID,cs:cnew(),st:{x:180,y:BYU,vx:0,vy:0,r:RS,m:1.8,on:true,t:'s'},turn:'you',phase:'aim',pot:[],drag:null,mt:0,over:false,sk:sk[0]};
- c.innerHTML=`<div class='ccn' id='ccn'></div><canvas id='cv5' width='360' height='360' class='cvx'></canvas><div class='ldc' style='margin:10px 0 4px'><div class='lms' id='lms'></div></div><label class='lb2'>↔ Slide to place your striker</label><input type='range' id='csl' min='70' max='290' value='180' class='rg'><button class='b back' id='lhp'>❓ How to play</button><div id='lov'></div>`;
- const cv=$('cv5'),pt=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*CW/r.width,y:(e.clientY-r.top)*CW/r.height}};
- $('csl').oninput=()=>{if(CA.phase=='aim'&&CA.turn=='you')CA.st.x=+$('csl').value};
- cv.onpointerdown=e=>{if(CA.phase!='aim'||CA.turn!='you')return;e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}CA.drag=pt(e)};
- cv.onpointermove=e=>{if(CA.drag)CA.drag=pt(e)};
- cv.onpointerup=()=>{const q=CA.drag;if(!q)return;CA.drag=null;const dx=CA.st.x-q.x,dy=CA.st.y-q.y,l=Math.hypot(dx,dy);if(l<14)return;const p=Math.min(l,110)/110*14+2;shoot(dx/l*p,dy/l*p)};
- $('lhp').onclick=chelp;ccnt();beginTurn('');loopC(CA.gid);
- if(!S.carHelp){S.carHelp=1;save();setTimeout(chelp,600)}}
-function shoot(vx,vy){CA.st.vx=vx;CA.st.vy=vy;CA.st.on=true;CA.phase='move';CA.pot=[];CA.mt=0;CA.drag=null;beep(400)}
-function beginTurn(msg){CA.phase='aim';CA.st.on=true;CA.st.vx=CA.st.vy=0;const you=CA.turn=='you';CA.st.y=you?BYU:BYB;CA.st.x=you?+$('csl').value:180;ccnt();
- csay((msg||'')+(you?'👆 Slide to place the striker, then <b>pull back on the board</b> and release.':'🤖 Bot is aiming…'));
- if(!you)ct(()=>{const s=botC();CA.st.x=s.sx;ct(()=>shoot(s.vx,s.vy),800)},900)}
-function segD(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy||1;let t=((px-ax)*dx+(py-ay)*dy)/l;t=Math.max(0,Math.min(1,t));return Math.hypot(px-(ax+t*dx),py-(ay+t*dy))}
-function botC(){const on=CA.cs.filter(c=>c.on),mine=on.filter(c=>c.t=='b'),T=mine.length?mine:on.filter(c=>c.t!='w');let best=null;
- for(const c of T)for(const p of PKT){const dx=p[0]-c.x,dy=p[1]-c.y,d=Math.hypot(dx,dy),ux=dx/d,uy=dy/d,gx=c.x-ux*(RS+RC),gy=c.y-uy*(RS+RC);
-  if(on.some(o=>o!==c&&segD(o.x,o.y,c.x,c.y,p[0],p[1])<RC*2-1))continue;
-  for(let sx=75;sx<=285;sx+=10){const sdx=gx-sx,sdy=gy-BYB,sd=Math.hypot(sdx,sdy),cs=(sdx*ux+sdy*uy)/sd;if(cs<.4||gy<BYB)continue;
-   if(on.some(o=>o!==c&&segD(o.x,o.y,sx,BYB,gx,gy)<RS+RC-1))continue;
-   const sc=cs*100-sd*.08-d*.1+(c.t=='b'?20:0)+Math.random()*8;if(!best||sc>best.sc)best={sc,sx,sd,d,ax:sdx/sd,ay:sdy/sd}}}
- if(!best){const c=T[Math.floor(Math.random()*T.length)]||on[0],sdx=c.x-180,sdy=c.y-BYB,sd=Math.hypot(sdx,sdy);best={sx:180,sd,d:60,ax:sdx/sd,ay:sdy/sd}}
- const ang=Math.atan2(best.ay,best.ax)+(Math.random()-.5)*(CA.mode=='ch'?.08:.16),v=Math.max(5,Math.min(15,(best.sd+1.8*best.d)/55));return{sx:best.sx,vx:Math.cos(ang)*v,vy:Math.sin(ang)*v}}
-function phys(){const A=CA.cs.concat([CA.st]).filter(c=>c.on);
- for(let s=0;s<4;s++){const dt=.25,f=Math.pow(FR,dt);
-  for(const c of A){if(!c.on)continue;c.x+=c.vx*dt;c.y+=c.vy*dt;c.vx*=f;c.vy*=f;
-   if(c.x<c.r){c.x=c.r;c.vx=Math.abs(c.vx)*.85}if(c.x>CW-c.r){c.x=CW-c.r;c.vx=-Math.abs(c.vx)*.85}if(c.y<c.r){c.y=c.r;c.vy=Math.abs(c.vy)*.85}if(c.y>CW-c.r){c.y=CW-c.r;c.vy=-Math.abs(c.vy)*.85}}
-  for(let i=0;i<A.length;i++)for(let j=i+1;j<A.length;j++){const a=A[i],b=A[j];if(!a.on||!b.on)continue;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),md=a.r+b.r;
-   if(d<md&&d>0){const nx=dx/d,ny=dy/d,ov=md-d,tm=a.m+b.m;a.x-=nx*ov*b.m/tm;a.y-=ny*ov*b.m/tm;b.x+=nx*ov*a.m/tm;b.y+=ny*ov*a.m/tm;const rv=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;
-    if(rv<0){const j2=-(1.92)*rv/(1/a.m+1/b.m);a.vx-=j2*nx/a.m;a.vy-=j2*ny/a.m;b.vx+=j2*nx/b.m;b.vy+=j2*ny/b.m;if(-rv>1.2)beep(250+Math.min(-rv*40,400))}}}
-  for(const c of A){if(!c.on)continue;for(const p of PKT)if(Math.hypot(c.x-p[0],c.y-p[1])<17){c.on=false;c.vx=c.vy=0;CA.pot.push(c);beep(120)}}}
- for(const c of A)if(c.on&&Math.hypot(c.vx,c.vy)<.05){c.vx=c.vy=0}}
-const cmoving=()=>CA.cs.concat([CA.st]).some(c=>c.on&&Math.hypot(c.vx,c.vy)>.07);
-function settle(){const me=CA.turn=='you'?'w':'b',pot=CA.pot;CA.pot=[];let keep=false,foul=false,msg='';
- for(const c of pot){if(c===CA.st)foul=true;else if(c.t=='q'){keep=true;msg+='👑 Queen pocketed! '}else if(c.t==me){keep=true;msg+='✅ Pocketed! '}else msg+='Opponent’s coin went in. '}
- if(foul){keep=false;msg='🚫 Foul! Striker pocketed. ';const lost=CA.cs.find(c=>!c.on&&c.t==me);if(lost){lost.x=180;lost.y=180;lost.vx=lost.vy=0;lost.on=true;msg+='One coin returns to the centre. '}}
- CA.st.vx=CA.st.vy=0;ccnt();
- if(!crem('w')||!crem('b')){endC(!crem('w'));return}
- if(!keep)CA.turn=CA.turn=='you'?'bot':'you';else msg+='Shoot again! ';beginTurn(msg)}
-function endC(win){CA.over=true;CA.phase='over';stat('lg');if(win)stat('lw');let g;if(CA.mode=='ch'){g=0;if(win){const d=new Date().toDateString();if(!S.chd||S.chd.d!==d)S.chd={d,n:0};if(S.chd.n<5){S.chd.n++;g=20;add(20)}}}else g=earnG(win?12:2);save();ccnt();
- $('lov').innerHTML=`<div class='cd tc' style='margin-top:12px'><h2>${win?'🏆 You won!':'🤖 Bot won'}</h2><p>${win?'All your coins are pocketed. Great shooting!':'Better luck next time.'} +${g} coins${CA.mode=='ch'&&win&&!g?' (daily prize limit reached)':''}</p><button class='b' id='lr'>Play again</button></div>`;$('lr').onclick=carLobby;csay(win?'🏆 You are the champion!':'🤖 The bot cleared its coins first')}
-function loopC(g){if(!CA||CA.gid!=g)return;if(CA.phase=='move'){phys();CA.mt++;if(!cmoving()||CA.mt>1200){CA.cs.concat([CA.st]).forEach(c=>{if(c.on&&CA.mt>1200)c.vx=c.vy=0});settle()}}drawC();requestAnimationFrame(()=>loopC(g))}
-function drawC(){const cv=$('cv5');if(!cv)return;const x=cv.getContext('2d'),th=CTH[S.theme||'g']||CTH.g;
- const g=x.createRadialGradient(180,180,20,180,180,260);g.addColorStop(0,th[0]);g.addColorStop(1,th[1]);x.fillStyle=g;x.fillRect(0,0,CW,CW);
- x.strokeStyle='rgba(60,30,0,.55)';x.lineWidth=2;x.strokeRect(34,34,292,292);
- x.beginPath();x.arc(180,180,40,0,7);x.stroke();x.beginPath();x.arc(180,180,13,0,7);x.stroke();
- [BYB,BYU].forEach(y=>{x.beginPath();x.moveTo(70,y);x.lineTo(290,y);x.stroke();[70,290].forEach(px=>{x.beginPath();x.arc(px,y,8,0,7);x.fillStyle='rgba(220,38,38,.6)';x.fill();x.stroke()})});
- PKT.forEach(p=>{const q=x.createRadialGradient(p[0],p[1],3,p[0],p[1],20);q.addColorStop(0,'#000');q.addColorStop(1,'#222');x.fillStyle=q;x.beginPath();x.arc(p[0],p[1],20,0,7);x.fill()});
- x.lineWidth=1;x.strokeStyle='rgba(60,30,0,.35)';PKT.forEach(p=>{x.beginPath();x.moveTo(p[0]+(p[0]<180?36:-36),p[1]+(p[1]<180?36:-36));x.lineTo(p[0]+(p[0]<180?70:-70),p[1]+(p[1]<180?70:-70));x.stroke()});
- const disc=(c,f,rg)=>{x.fillStyle='rgba(0,0,0,.28)';x.beginPath();x.arc(c.x+2,c.y+3,c.r,0,7);x.fill();const q=x.createRadialGradient(c.x-c.r*.35,c.y-c.r*.4,1,c.x,c.y,c.r);q.addColorStop(0,f[0]);q.addColorStop(1,f[1]);x.fillStyle=q;x.beginPath();x.arc(c.x,c.y,c.r,0,7);x.fill();x.strokeStyle=rg;x.lineWidth=1.5;x.beginPath();x.arc(c.x,c.y,c.r-3,0,7);x.stroke()};
- CA.cs.forEach(c=>{if(!c.on)return;disc(c,c.t=='w'?['#fffdf5','#d9cfb8']:c.t=='b'?['#555','#111']:['#ff6b6b','#b91c1c'],c.t=='b'?'#888':'rgba(0,0,0,.35)')});
- if(CA.st.on&&CA.phase!='over')disc(CA.st,CA.turn=='you'?[CA.sk,'#999']:['#7dd3fc','#0369a1'],'rgba(0,0,0,.45)');
- if(CA.drag&&CA.phase=='aim'){const s=CA.st,dx=s.x-CA.drag.x,dy=s.y-CA.drag.y,l=Math.hypot(dx,dy);if(l>6){const ux=dx/l,uy=dy/l;let t=300;
-  CA.cs.forEach(c=>{if(!c.on)return;const px=c.x-s.x,py=c.y-s.y,pr=px*ux+py*uy;if(pr<=0)return;const pe=Math.abs(px*uy-py*ux),R=RS+RC;if(pe<R){const tt=pr-Math.sqrt(R*R-pe*pe);if(tt<t)t=tt}});
-  x.strokeStyle='rgba(255,255,255,.9)';x.setLineDash([6,6]);x.lineWidth=2;x.beginPath();x.moveTo(s.x,s.y);x.lineTo(s.x+ux*t,s.y+uy*t);x.stroke();x.setLineDash([]);x.beginPath();x.arc(s.x+ux*t,s.y+uy*t,RS,0,7);x.stroke();
-  x.strokeStyle='rgba(220,38,38,.8)';x.lineWidth=4;x.beginPath();x.moveTo(s.x,s.y);x.lineTo(CA.drag.x,CA.drag.y);x.stroke()}}}
-function chelp(){const m=$('mo');m.style.display='flex';m.innerHTML=`<div class='mb2'><h3 class='tc'>🎯 How to play Carrom</h3><div class='cd'><p>🎯 <b>Goal:</b> pocket all 9 <b>white</b> coins before the bot pockets its 9 black coins.</p><p>↔ <b>Place:</b> slide the bar under the board to move your striker along your line.</p><p>🏹 <b>Shoot:</b> put your finger on the board and <b>pull back</b>, like a slingshot. The white dotted line shows where the striker will go. Pull further for more power, then let go.</p><p>✅ <b>Pocket your own coin</b> and you shoot again.</p><p>👑 The red <b>Queen</b> also gives you another shot.</p><p>🔁 If you pocket an <b>opponent’s</b> coin, your turn ends.</p><p>🚫 <b>Foul:</b> if your striker falls into a pocket, you lose the turn and one of your coins returns to the centre.</p></div><button class='b' id='lx2'>Got it, let me play</button></div>`;$('lx2').onclick=()=>{m.style.display='none'}}
+// ---- Mines ----
+const DSK={w:['#ffffff','#111111'],g:['#ffd23f','#3b1d00'],n:['#22d3ee','#083344']}; // striker skin colours — used by Shop
+const MN_ROWS=5,MN_COLS=6,MN_BOXES=30,MN_MINES=5,MN_OPENS=5,MN_WIN=10;
+let MN=null;
+function mnNewBoard(){const idx=Array.from({length:MN_BOXES},(_,i)=>i);
+ for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=idx[i];idx[i]=idx[j];idx[j]=t}
+ return{mines:new Set(idx.slice(0,MN_MINES)),hint:idx[MN_MINES],open:new Set(),opens:0,over:false}}
+function mnDist(a,b){const r1=Math.floor(a/MN_COLS),c1=a%MN_COLS,r2=Math.floor(b/MN_COLS),c2=b%MN_COLS;return Math.abs(r1-r2)+Math.abs(c1-c2)}
+function mines(){const c=$('gc');let lv=1;MN=mnNewBoard();
+ const msg=t=>{const m=$('mnmsg');if(m)m.innerHTML=t};
+ const confetti=()=>{const w=$('gc');if(!w)return;const d=document.createElement('div');d.className='cfs';d.id='mncf';
+  const em=['🪙','⭐','🎉','💰'];for(let i=0;i<24;i++){const s=document.createElement('span');s.textContent=em[i%em.length];s.style.left=(Math.random()*100)+'%';s.style.animationDelay=(Math.random()*.6)+'s';d.appendChild(s)}
+  w.appendChild(d);setTimeout(()=>{const x=$('mncf');if(x)x.remove()},2600)};
+ const refill=()=>{const b=$('mnref');if(b)b.disabled=true;
+  showAd(()=>{S.mn_en=10;save();hdr();render()},x=>msg(x),()=>{render()})};
+ const revealAll=()=>{const g=$('mng');if(!g)return;g.querySelectorAll('.mnb').forEach(b=>{const i=+b.dataset.i;b.disabled=true;
+  if(MN.mines.has(i)){b.classList.add('mine');b.textContent='💣'}
+  else if(i===MN.hint){b.classList.add('hint');b.textContent='5'}
+  else if(!MN.open.has(i)){b.classList.add('open');b.textContent=mnDist(i,MN.hint)}})};
+ const endLevel=(win,why)=>{MN.over=true;stat('mn');let g=0;
+  if(win){stat('mnw');g=earnG(MN_WIN);confetti()}
+  else{S.mn_en=Math.max(0,(S.mn_en==null?10:S.mn_en)-1);save()}
+  const r=$('mnres');if(!r)return;
+  if(win){r.innerHTML=`<div class='cd tc'><h3>🎉 You won!</h3><p>"5" mil gaya! +${g} coins</p><button class='b' id='mnnx'>Agla Level →</button></div>`;
+   $('mnnx').onclick=()=>{lv++;MN=mnNewBoard();render()}}
+  else{r.innerHTML=`<div class='cd tc'><h3>💥 Level Failed</h3><p>${why}</p><p>⚡ Energy: ${S.mn_en}/10</p><button class='b p' id='mnrv'>👁️ Board Dekho</button>${S.mn_en>0?`<button class='b' id='mnrt'>🔄 Try Again</button>`:`<button class='b' id='mnref'>📺 Watch ad · Energy refill</button>`}</div>`;
+   $('mnrv').onclick=()=>{revealAll();$('mnrv').disabled=true};
+   const rt=$('mnrt');if(rt)rt.onclick=()=>{MN=mnNewBoard();render()};
+   const rf=$('mnref');if(rf)rf.onclick=refill}};
+ const openBox=i=>{if(!MN||MN.over||MN.open.has(i))return;
+  if((S.mn_en==null?10:S.mn_en)<=0){msg('⚡ Energy khatam! Pehle ad dekh kar energy refill karo.');return}
+  const b=$('mnb-'+i);MN.open.add(i);
+  if(MN.mines.has(i)){if(b){b.classList.add('mine');b.textContent='💣';b.parentElement.classList.add('shake')}
+   endLevel(false,'💣 Mine par click ho gaya!');return}
+  if(i===MN.hint){if(b){b.classList.add('hint');b.textContent='5'}MN.opens++;endLevel(true);return}
+  const d=mnDist(i,MN.hint);if(b){b.classList.add('open');b.textContent=d}
+  MN.opens++;const left=MN_OPENS-MN.opens;
+  if(left<=0){endLevel(false,'5 tries khatam — hint "5" nahi mila.');return}
+  msg(d<=2?'🔥 Bohat qareeb hai!':d<=4?'👍 Qareeb hai — soch kar kholo':'🔍 Door hai — hint number dekho');
+  const t=$('mntr');if(t)t.textContent='Tries left: '+left};
+ const render=()=>{if(S.mn_en==null){S.mn_en=10;save()}
+  c.innerHTML=`<div class='cd tc' style='background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:0;color:#fff'><h2>💣 Mines</h2><p>Level ${lv} · ⚡ Energy ${S.mn_en}/10 · 🪙 ${S.coins} coins</p></div>
+  <p class='tc' id='mntr'>Tries left: ${MN_OPENS}</p>
+  <div class='mng' id='mng'>${Array.from({length:MN_BOXES},(_,i)=>`<button class='mnb' id='mnb-${i}' data-i='${i}' ${S.mn_en<=0?'disabled':''}>?</button>`).join('')}</div>
+  <p class='tc' id='mnmsg' style='min-height:20px'>👆 5 dabbe kholo aur "5" dhoondho!</p>
+  <div id='mnres'></div>
+  ${S.mn_en<=0?`<button class='b' id='mnref'>📺 Watch ad · Energy refill (10/10)</button>`:''}
+  <div class='cd'><h3>📜 Rules / Kaise khele</h3><p>💣 30 dabbon mein <b>5 mines</b> aur ek <b>"5" wala hint</b> chhupa hai.</p><p>👆 Sirf <b>5 dabbe</b> khol sakte ho. Safe dabbe par <b>hint number</b> aata hai — number jitna chhota, "5" utna qareeb.</p><p>🏆 "5" mil gaya to <b>WIN +${MN_WIN} coins</b> aur agla level.</p><p>💥 Mine par click ya 5 tries khatam to <b>level FAIL, -1 energy</b>.</p><p>⚡ Energy 10 hai — khatam ho to <b>ad dekh kar refill</b> karo.</p></div>`;
+  c.querySelectorAll('.mnb').forEach(b=>b.onclick=()=>openBox(+b.dataset.i));
+  const rf=$('mnref');if(rf)rf.onclick=refill};
+ render()}
 
 // ---- Ludo ----
 // LU-PURE-START (pure logic — also exercised by the node simulation test)
@@ -506,6 +495,11 @@ function luEnd(winner,quit){if(!LU)return;LU.over=true;LU.canRoll=false;luClearH
  const pa=$('lpa'),hb=$('lhb');if(pa)pa.onclick=()=>ludo();if(hb)hb.onclick=closeGame;
  luMsg(quit?'Game over.':youWon?'🏆 Champion!':'Game over.')}
 function luQuit(){if(!LU||LU.over)return;luEnd(null,true)}
+// ---- Missions (nav tab: all earn methods + missions, minus Spin & Check-in) ----
+function missions(){const s=S.st,M=[['Play 3 Mines levels',(s.mn||0)>=3,30,'i',Math.min(s.mn||0,3)+'/3'],['Win a Mines level',(s.mnw||0)>=1,40,'k',Math.min(s.mnw||0,1)+'/1'],['Win a Ludo game',(s.lu||0)>=1,30,'j',Math.min(s.lu||0,1)+'/1'],['Win a Memory Match',(s.mm||0)>=1,20,'c',Math.min(s.mm||0,1)+'/1'],['Score 10 in Snake',(s.bs||0)>=10,30,'d',Math.min(s.bs||0,10)+'/10'],['Reach 256 in 2048',(s.m24||0)>=256,40,'e',Math.min(s.m24||0,256)+'/256'],['Beat the bot in Tic-Tac-Toe',(s.ttt||0)>=1,20,'f',Math.min(s.ttt||0,1)+'/1'],['Watch 3 ads',(S.ads||0)>=3,30,'g',Math.min(S.ads||0,3)+'/3'],['Watch 10 ads',(S.ads||0)>=10,80,'h',Math.min(S.ads||0,10)+'/10']];
+ $('mn').innerHTML=`<h3 class='h3'>🎯 Missions</h3><div class='gr'><button class='gt' data-s='ad' style='background:linear-gradient(135deg,#dc2626,#f97316)'><span>📺</span>Watch Ads<small>+${CFG.adC} 🪙 each</small></button><button class='gt' data-s='chips' style='background:linear-gradient(135deg,#d97706,#f59e0b)'><span>♠</span>Free Chips<small>Daily 200 + ads</small></button></div><div class='cd' style='margin-top:12px'><b>More ways</b><p>🎬 Watch videos and 📣 join our channels in the Videos tab, and 🤝 invite friends in the Invite tab.</p></div><div class='cd' style='margin-top:12px'><h2>🎯 Missions</h2>${M.map(x=>`<div class='row'><span>${x[0]} <small>(${x[4]})</small></span><button class='sm' data-k='${x[3]}' ${x[1]&&!S.cl[x[3]]?'':'disabled'}>${S.cl[x[3]]?'Claimed':'+'+x[2]+' 🪙'}</button></div>`).join('')}</div><p class='ft'>Coins convert to PKR in your Wallet. Game rewards are capped each day.</p>`;
+ document.querySelectorAll('#mn .gt[data-s]').forEach(b=>b.onclick=()=>{scr=b.dataset.s;sub()});
+ $('mn').querySelectorAll('.sm').forEach(b=>b.onclick=()=>{const x=M.find(y=>y[3]==b.dataset.k);S.cl[x[3]]=1;add(x[2]);missions()})}
 // ---- Earn ----
 function earn(){if(scr!='hub')return sub();const td=new Date().toDateString();
  const t=[['spin','🎡','Daily Spin',S.spin&&Date.now()-S.spin<864e5?'Free used · ad spins':'Free spin ready!','linear-gradient(135deg,#7c3aed,#a855f7)'],['ci','📅','Daily Check-in',S.ci===td?'Done today':'Claim now!','linear-gradient(135deg,#0ea5e9,#2563eb)'],['ad','📺','Watch Ads','+'+CFG.adC+' 🪙 each','linear-gradient(135deg,#dc2626,#f97316)'],['mis','🎯','Missions','8 tasks','linear-gradient(135deg,#059669,#10b981)'],['chips','♠','Free Chips','Daily 200 + ads','linear-gradient(135deg,#d97706,#f59e0b)']];
@@ -521,15 +515,15 @@ function sub(){const m=$('mn'),td=new Date().toDateString(),bk=`<button class='b
  if(!free){clearInterval(window.sptm);const upd=()=>{const el=$('spt');if(!el){clearInterval(window.sptm);return}const ms=S.spin+864e5-Date.now();if(ms<=0){clearInterval(window.sptm);if(scr=='spin')sub();return}const s=Math.floor(ms/1000);el.textContent='Free Spin Available In '+String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};window.sptm=setInterval(upd,1000);upd()}}
  else if(scr=='ci'){const R=[10,15,20,25,30,40,100],can=S.ci!==td,st=S.stk||0,nx=st>=7?1:st+1;m.innerHTML=bk+`<div class='cd'><h2>📅 7-Day Check-in</h2><p>Collect every day. Day 7 gives a big bonus!</p><div class='dg'>${R.map((r,i)=>`<div class='dy ${i<st?'dn':''} ${can&&i+1==nx&&st<7?'td':''} ${i==6?'bn2':''}'>Day ${i+1}<b>${i==6?'🎁':'🪙'}</b>${i<st?'✓':'+'+r}</div>`).join('')}</div><button class='b' id='ck' ${can?'':'disabled'}>${can?'Claim Day '+nx+' · +'+R[nx-1]+' 🪙':'Come back tomorrow'}</button></div>`;
   $('ck').onclick=()=>{S.stk=nx;S.ci=td;add(R[nx-1]);sub()}}
- else if(scr=='chips'){const can=S.cd!==td;m.innerHTML=bk+`<div class='cd tc'><h2>♠ Free Chips</h2><p>Chips are entry tickets for the Carrom Challenge. They are free only and cannot be bought or converted.</p><h3 style='color:#b45309'>You have ♠ ${S.chips}</h3><button class='b' id='cq' ${can?'':'disabled'}>${can?'Claim daily 200 chips':'Come back tomorrow'}</button><button class='b p' id='cw'>📺 Watch ad · +100 chips</button></div>`;
+ else if(scr=='chips'){const can=S.cd!==td;m.innerHTML=bk+`<div class='cd tc'><h2>♠ Free Chips</h2><p>Chips buy fancy Ludo tokens & dice. They are free only and cannot be bought or converted.</p><h3 style='color:#b45309'>You have ♠ ${S.chips}</h3><button class='b' id='cq' ${can?'':'disabled'}>${can?'Claim daily 200 chips':'Come back tomorrow'}</button><button class='b p' id='cw'>📺 Watch ad · +100 chips</button></div>`;
   $('cq').onclick=()=>{S.chips+=200;S.cd=td;save();hdr();sub()};
   $('cw').onclick=()=>{const b=$('cw');b.disabled=true;showAd(()=>{S.chips+=100;save();hdr();sub()},x=>{b.textContent=x},()=>sub())}}
  else if(scr=='ad'){m.innerHTML=bk+`<div class='cd tc'><h2>📺 Watch Ads</h2><p>Watch a short ad and get <b>+${CFG.adC} 🪙</b>. Watched so far: ${S.ads||0}</p><button class='b' id='e2'>Watch ad</button></div>`;
   $('e2').onclick=()=>{const b=$('e2');b.disabled=true;showAd(()=>{S.ads=(S.ads||0)+1;add(CFG.adC);sub()},x=>{b.textContent=x},()=>sub())}}
- else{const s=S.st,M=[['Play 3 Carrom games',(s.lg||0)>=3,30,'a',Math.min(s.lg||0,3)+'/3'],['Win a Carrom game',(s.lw||0)>=1,40,'b',Math.min(s.lw||0,1)+'/1'],['Win a Ludo game',(s.lu||0)>=1,30,'j',Math.min(s.lu||0,1)+'/1'],['Win a Memory Match',(s.mm||0)>=1,20,'c',Math.min(s.mm||0,1)+'/1'],['Score 10 in Snake',(s.bs||0)>=10,30,'d',Math.min(s.bs||0,10)+'/10'],['Reach 256 in 2048',(s.m24||0)>=256,40,'e',Math.min(s.m24||0,256)+'/256'],['Beat the bot in Tic-Tac-Toe',(s.ttt||0)>=1,20,'f',Math.min(s.ttt||0,1)+'/1'],['Watch 3 ads',(S.ads||0)>=3,30,'g',Math.min(S.ads||0,3)+'/3'],['Watch 10 ads',(S.ads||0)>=10,80,'h',Math.min(S.ads||0,10)+'/10']];
+ else{const s=S.st,M=[['Play 3 Mines levels',(s.mn||0)>=3,30,'i',Math.min(s.mn||0,3)+'/3'],['Win a Mines level',(s.mnw||0)>=1,40,'k',Math.min(s.mnw||0,1)+'/1'],['Win a Ludo game',(s.lu||0)>=1,30,'j',Math.min(s.lu||0,1)+'/1'],['Win a Memory Match',(s.mm||0)>=1,20,'c',Math.min(s.mm||0,1)+'/1'],['Score 10 in Snake',(s.bs||0)>=10,30,'d',Math.min(s.bs||0,10)+'/10'],['Reach 256 in 2048',(s.m24||0)>=256,40,'e',Math.min(s.m24||0,256)+'/256'],['Beat the bot in Tic-Tac-Toe',(s.ttt||0)>=1,20,'f',Math.min(s.ttt||0,1)+'/1'],['Watch 3 ads',(S.ads||0)>=3,30,'g',Math.min(S.ads||0,3)+'/3'],['Watch 10 ads',(S.ads||0)>=10,80,'h',Math.min(S.ads||0,10)+'/10']];
   m.innerHTML=bk+`<div class='cd'><h2>🎯 Missions</h2>${M.map(x=>`<div class='row'><span>${x[0]} <small>(${x[4]})</small></span><button class='sm' data-k='${x[3]}' ${x[1]&&!S.cl[x[3]]?'':'disabled'}>${S.cl[x[3]]?'Claimed':'+'+x[2]+' 🪙'}</button></div>`).join('')}</div>`;
   m.querySelectorAll('.sm').forEach(b=>b.onclick=()=>{const x=M.find(y=>y[3]==b.dataset.k);S.cl[x[3]]=1;add(x[2]);sub()})}
- $('bk').onclick=()=>{scr='hub';earn()}}
+ $('bk').onclick=()=>{scr='hub';tab=='mis'?missions():earn()}}
 // ---- Videos & channels ----
 let pend=null,vp=null;
 function fin(k){if(!pend||pend.k!=k)return;clearTimeout(pend.tm);pend=null;S.f[k]=1;add(CFG.follow);if(tab=='vids')vids()}
@@ -554,7 +548,6 @@ function vtb(s){let p='';for(let i=0;i<20;i++){const r=i%2?9.3:11.2,a=i*Math.PI/
  return `<svg class='vb' width='${s}' height='${s}' viewBox='0 0 24 24'><path d='${p}Z' fill='#1877f2' stroke='#1877f2' stroke-width='1.6' stroke-linejoin='round'/><path d='M7.6 12.4l3 3 5.8-6.2' fill='none' stroke='#fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/></svg>`}
 // ---- Shop (fun items only; nothing here adds to cash balance) ----
 const AVS=[['🐉',150],['🦅',150],['🐺',200],['🦋',100],['👽',250],['🤖',300]];
-const THS=[['b','Ocean',200,'#bfdbfe'],['r','Rose',200,'#fecdd3'],['k','Night',300,'#3f3f46']];
 const vipOn=()=>S.vip>Date.now();
 function dlg(msg,ok){const m=$('mo');m.style.display='flex';m.innerHTML=`<div class='mb2 tc'><h3>Demo purchase</h3><p style='opacity:.9'>${msg}</p><p style='opacity:.65;font-size:12px'>No money is charged in this demo. In the real app this opens JazzCash, Easypaisa or Google Play payment.</p><button class='b' id='dy'>Confirm (demo)</button><button class='b back' id='dn'>Cancel</button></div>`;$('dn').onclick=()=>{m.style.display='none'};$('dy').onclick=()=>{m.style.display='none';ok()}}
 function payFlow(item,amt,done){const m=$('mo'),MT=['JazzCash','Easypaisa','Card (demo)'];let me='JazzCash',ph='';m.style.display='flex';
@@ -572,12 +565,10 @@ function payFlow(item,amt,done){const m=$('mo'),MT=['JazzCash','Easypaisa','Card
 function shop(){const v=vipOn(),q=s=>document.querySelectorAll(s),ow=k=>S.own[k]||(S.own[k]=[]);
  $('gc').innerHTML=`<div class='cd' style='background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff'><h3>👑 VIP Pass · 30 days</h3><p>Blue verified badge next to your name, gold crown, gold avatar frame and the Gold striker skin. VIP does not change your coin earnings.</p>${v?`<p><b>Active until ${new Date(S.vip).toLocaleDateString()}</b></p>`:`<button class='b' id='vb' style='background:#fff'>Rs 500 · Buy VIP (demo)</button>`}</div>
  <div class='cd'><h3>🎭 Avatars</h3><p>Pay with coins.</p>${AVS.map((a,i)=>`<div class='row'><span style='font-size:28px;flex:none'>${a[0]}</span><span>${a[1]} 🪙</span><button class='sm' data-a='${i}' ${ow('av').includes(a[0])?'disabled':''}>${ow('av').includes(a[0])?'Owned':'Buy'}</button></div>`).join('')}</div>
- <div class='cd'><h3>🎨 Carrom board themes</h3><div class='row'><span><i class='sw' style='background:#e7c48a'></i>Classic</span><button class='sm' data-t='g' ${(S.theme||'g')=='g'?'disabled':''}>${(S.theme||'g')=='g'?'Using':'Use'}</button></div>${THS.map(t=>`<div class='row'><span><i class='sw' style='background:${t[3]}'></i>${t[1]}${ow('th').includes(t[0])?'':' · '+t[2]+' 🪙'}</span><button class='sm' data-t='${t[0]}' ${S.theme==t[0]?'disabled':''}>${ow('th').includes(t[0])?(S.theme==t[0]?'Using':'Use'):'Buy'}</button></div>`).join('')}</div>
  <div class='cd'><h3>🎲 Striker skins</h3>${[['w','Classic',0],['g','Gold',150],['n','Neon',200]].map(d=>{const has=d[2]==0||ow('dice').includes(d[0])||(d[0]=='g'&&v),on=(S.dice||'w')==d[0];return `<div class='row'><span><i class='sw' style='background:${DSK[d[0]][0]}'></i>${d[1]}${has?'':' · '+d[2]+' 🪙'}</span><button class='sm' data-d='${d[0]}' data-p='${d[2]}' ${on?'disabled':''}>${on?'Using':has?'Use':'Buy'}</button></div>`}).join('')}</div>
  ${(S.rcpt||[]).length?`<div class='cd'><h3>🧾 Purchases</h3>${S.rcpt.slice(-5).reverse().map(r=>`<div class='row'><span>${r.i}<br><small>${r.d} · ${r.id}</small></span><b>Rs ${r.a}</b></div>`).join('')}</div>`:''}<p class='ft'>Items are for fun only. Purchases never add to your cash balance.</p>`;
  if($('vb'))$('vb').onclick=()=>payFlow('VIP Pass · 30 days',500,()=>{S.vip=Date.now()+30*864e5;save();hdr();shop()});
  q('.sm[data-a]').forEach(b=>b.onclick=()=>{const a=AVS[+b.dataset.a];if(S.coins<a[1]){b.textContent='Need coins';return}S.coins-=a[1];ow('av').push(a[0]);S.av=a[0];save();hdr();shop()});
- q('.sm[data-t]').forEach(b=>b.onclick=()=>{const t=b.dataset.t;if(t=='g'||ow('th').includes(t)){S.theme=t}else{const x=THS.find(y=>y[0]==t);if(S.coins<x[2]){b.textContent='Need coins';return}S.coins-=x[2];ow('th').push(t);S.theme=t}save();hdr();shop()});
  q('.sm[data-d]').forEach(b=>b.onclick=()=>{const d=b.dataset.d,p=+b.dataset.p,has=p==0||ow('dice').includes(d)||(d=='g'&&vipOn());if(!has){if(S.coins<p){b.textContent='Need coins';return}S.coins-=p;ow('dice').push(d)}S.dice=d;save();hdr();shop()})}
 // ---- Wallet ----
 const BANKS=['JazzCash','Easypaisa','HBL','UBL','MCB Bank','Allied Bank','Bank Alfalah','Meezan Bank','Askari Bank','Faysal Bank','Bank Al Habib','Habib Metro','Standard Chartered','Soneri Bank','National Bank of Pakistan','Bank of Punjab','Sada Pay','NayaPay'];
