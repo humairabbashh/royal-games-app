@@ -285,7 +285,7 @@ function go(t){tab=t;if(t!='earn')scr='hub';navHi(t);({home,mis:missions,earn,vi
 document.querySelectorAll('#nv button').forEach(b=>b.onclick=()=>go(b.dataset.t));
 function home(){
  $('mn').innerHTML=`<div class='hm'>
- <button id='vpb' class='vipb'><b>👑 VIP PASS</b><small>Rs 500 · 30 days · Verified badge + Gold striker</small></button>
+ <button id='vpb' class='vipb'><b>👑 VIP PASS</b><small>Rs 500 · 30 days · Verified badge + Gold striker + 1000 ♠ chips</small></button>
  <button class='gt' id='shp' style='display:flex;align-items:center;justify-content:center;gap:10px;font-size:17px;padding:12px;background:linear-gradient(135deg,#a855f7,#7c3aed)'><span style='display:inline;font-size:22px;margin:0'>🛍️</span>Shop</button>
 <div class='hgr'><div class='hcol'><button class='gt' data-s='spin' style='background:#000;color:#fff'><span><svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='#fff' stroke-width='1.8' stroke-linecap='round'><circle cx='12' cy='12' r='8.5'/><circle cx='12' cy='12' r='2'/><path d='M12 3.5v17M3.5 12h17M6 6l12 12M18 6L6 18'/></svg></span>Spin</button><button class='gt' data-g='mm' style='background:linear-gradient(135deg,#11998e,#38ef7d)'><span>🧠</span>Memory Match<small>Free · win coins</small></button>
 <button class='gt' data-g='g24' style='background:linear-gradient(135deg,#f7971e,#ffd200);color:#3b1d00'><span>🔢</span>2048<small>Free · win coins</small></button>
@@ -386,12 +386,25 @@ function mines(){const c=$('gc');let lv=1,firstRender=true,refilling=false;MN=mn
   showAd(()=>{refilling=false;S.mn_en=10;save();hdr();updHUD();sndAd();showRefilled()},
    x=>setStatus('📺 Ad…',x||'Ad load ho raha hai…'),
    ()=>{refilling=false;setStatus('📺 Ad nahi chala','Dobara try karo.')})};
- const showNoEnergy=()=>{showModal(`<div class="mn-big">🪫</div><h3>Energy Khatam!</h3><p>Tumhari 10 energy khatam ho gayi hai. Ek chhota sa ad dekho aur energy wapas 10/10 bhar lo, phir khelo.</p><button class="mn-btn mn-btn-gold" id="mnadgo">📺 Ad Dekho — Energy +10 ⚡</button>`);
-  $('mnadgo').onclick=()=>{sndClick();hideModal();refill()}};
+ // chips refill: 50 chips = +1 energy (capped at 10); returns true if bought
+ const buyEnergyChips=subEl=>{if(en()>=10){const s=$(subEl);if(s)s.innerHTML='✅ Energy pehle se <b>10/10 full</b> hai!';return false}
+  if(S.chips<50){const s=$(subEl);if(s)s.innerHTML='⚠️ <b>Chips kam hain!</b> Tumhare paas 50 chips nahi hain. Ad dekho ya chips kamao.';return false}
+  S.chips-=50;S.mn_en=Math.min(10,en()+1);save();hdr();updHUD();sndAd();
+  const s=$(subEl);if(s)s.innerHTML=`✅ +1 Energy! <b>Baaki: ${en()}/10</b> — aur +1 chahiye to dobara chips se lo, ya band kar ke khelo.`;
+  return true};
+ const showNoEnergy=()=>{showModal(`<div class="mn-big">🪫</div><h3>Energy Khatam!</h3><p id="mnne-sub">Tumhari 10 energy khatam ho gayi hai. Ek chhota sa ad dekho aur energy wapas 10/10 bhar lo, ya 50 chips se +1 energy lo.</p><button class="mn-btn mn-btn-gold" id="mnadgo">📺 Ad Dekho — Energy +10 ⚡</button><button class="mn-btn" id="mnchipsgo" style="background:#1e293b;color:#fff">♠ 50 Chips — Energy +1 ⚡</button><button class="mn-btn mn-btn-ghost" id="mnneclose">Band Karo</button>`);
+  $('mnadgo').onclick=()=>{sndClick();hideModal();refill()};
+  $('mnchipsgo').onclick=()=>{sndClick();buyEnergyChips('mnne-sub')};
+  $('mnneclose').onclick=()=>{sndClick();hideModal();if(en()>0){MN=mnNewBoard();render()}}};
  const showEnergyFull=()=>{showModal(`<div class="mn-big">⚡</div><h3>Energy Pehle Se Full Hai</h3><p>Energy 10/10 hai — ad ki zaroorat nahi. Khelo!</p><button class="mn-btn mn-btn-gold" id="mnok">Theek Hai</button>`);
   $('mnok').onclick=()=>{sndClick();hideModal()}};
  const showRefilled=()=>{showModal(`<div class="mn-big">⚡</div><h3>Energy Full!</h3><p>Energy wapas 10/10 ho gayi hai. Ab phir se khelo!</p><button class="mn-btn mn-btn-gold" id="mnplay">▶️ Khelo</button>`);
   $('mnplay').onclick=()=>{sndClick();hideModal();MN=mnNewBoard();render()}};
+ // Ad-button refill choice: full refill via ad, or +1 energy for 50 chips
+ const showRefillChoice=()=>{showModal(`<div class="mn-big">⚡</div><h3>Energy Bharo</h3><p id="mnrc-sub">Energy: <b>${en()}/10</b> — ad se full 10/10 bhar lo, ya 50 chips se +1 lo.</p><button class="mn-btn mn-btn-gold" id="mnrcad">📺 Ad Dekho — Energy +10 ⚡</button><button class="mn-btn" id="mnrcchips" style="background:#1e293b;color:#fff">♠ 50 Chips — Energy +1 ⚡</button><button class="mn-btn mn-btn-ghost" id="mnrcclose">Band Karo</button>`);
+  $('mnrcad').onclick=()=>{sndClick();hideModal();refill()};
+  $('mnrcchips').onclick=()=>{sndClick();if(buyEnergyChips('mnrc-sub')&&en()>=10){hideModal();showRefilled()}};
+  $('mnrcclose').onclick=()=>{sndClick();hideModal()}};
  const showWinModal=g=>{showModal(`<div class="mn-big">🏆</div><h3>Level ${lv} WIN!</h3><p>Tum ne 5 tries ke andar "5" wala dabba dhoond liya.</p><div class="mn-reward">+ ${g} Coins 🪙 · Total: ${S.coins}</div><button class="mn-btn mn-btn-gold" id="mnnext">▶️ Agla Level ${lv+1}</button>`);
   $('mnnext').onclick=()=>{sndClick();hideModal();lv++;MN=mnNewBoard();render()}};
  const failModal=kind=>{if(en()<=0){showNoEnergy();return}
@@ -444,13 +457,13 @@ function mines(){const c=$('gc');let lv=1,firstRender=true,refilling=false;MN=mn
    <li><span>🔢</span><div>Jo dabba mine nahi hai, us par <b>number</b> ayega — ye hint hai: number jitna chhota, <b>"5" wala dabba</b> utna qareeb hai.</div></li>
    <li><span>🏆</span><div><b>"5" mil gaya to WIN!</b> Tumhe <b>10 coins</b> 🪙 milenge aur agla level khul jayega.</div></li>
    <li class="warn"><span>💣</span><div>Mine par click ho gaya, ya 5 tries khatam ho gayin aur "5" na mila — to level <b>FAIL</b>, aur <b>1 energy</b> ⚡ kam ho jayegi.</div></li>
-   <li><span>⚡</span><div>Total energy <b>10</b> hai. Energy khatam ho jaye to <b>ad dekh kar energy dobara hasil karo</b>.</div></li>
+   <li><span>⚡</span><div>Total energy <b>10</b> hai. Energy khatam ho jaye to <b>ad dekh kar energy dobara hasil karo</b>, ya <b>50 chips ♠ se +1 energy</b> lo.</div></li>
   </ul></div>
   <div class="mn-overlay" id="mnov"><div class="mn-modal" id="mnmodal"></div></div>
   </div>`;
   c.querySelectorAll('.mn-tile').forEach(b=>b.onclick=()=>openBox(+b.dataset.i));
   $('mnshuffle').onclick=()=>{sndClick();if(en()<=0){showNoEnergy();return}MN=mnNewBoard();render()};
-  $('mnad').onclick=()=>{sndClick();if(en()>=10){showEnergyFull();return}refill()};
+  $('mnad').onclick=()=>{sndClick();if(en()>=10){showEnergyFull();return}showRefillChoice()};
   updHUD();updPips();
   if(firstRender){setStatus('5 wala dabba dhoondo!','30 dabbon mein 1 "5" aur 5 mines chhupe hain.');firstRender=false}
   else setStatus('Level '+lv+' — 5 wala dabba dhoondo!','Sirf 5 dabbe open kar sakte ho. Mines se bacho 💣');
@@ -485,13 +498,13 @@ function luBotPick(players,pi,d){const me=players[pi],legal=luLegal(me.tokens,d)
   if(s>bs){bs=s;best=ti}}
  return best}
 // LU-PURE-END
-const LU_SKINS={classic:{name:'Classic',price:0,cur:'coins',desc:'Original Ludo tokens'},chip:{name:'Chip ♠',price:100,cur:'chips',desc:'Fancy chip tokens'},gold:{name:'Gold',price:250,cur:'chips',desc:'Gold trim on your color tokens'},royal:{name:'Rs Royal',price:5,cur:'pkr',desc:'Rs tokens + gold dice'}};
+const LU_SKINS={classic:{name:'Classic',price:0,cur:'coins',desc:'Original Ludo tokens'},chip:{name:'Chip ♠',price:100,cur:'chips',desc:'Fancy chip tokens'},gold:{name:'Gold',price:250,cur:'chips',desc:'Gold trim on your color tokens'},silver:{name:'Silver',price:150,cur:'chips',desc:'Silver trim on your color tokens'},ruby:{name:'Ruby',price:350,cur:'chips',desc:'Ruby gem on your color tokens'},diamond:{name:'Diamond',price:500,cur:'chips',desc:'Diamond sparkle on your color tokens'},royal:{name:'Rs Royal',price:5,cur:'pkr',desc:'Rs tokens + gold dice'}};
 let LU=null,LUGID=0;
 const lgo=(fn,ms)=>{const g=LU?LU.gid:0;setTimeout(()=>{if(LU&&LU.gid===g&&$('gc')&&$('gs').style.display!=='none')fn()},ms)};
 function ludo(){const c=$('gc');let mode=2;
  const owned=k=>k=='classic'||(S.ludoSkins||[]).includes(k);
  const skinRow=k=>{const s=LU_SKINS[k],has=owned(k),on=(S.ludoSkin||'classic')==k;
-  return `<div class='row'><span>${k=='chip'?'♠ ':k=='gold'?'🥇 ':k=='royal'?'₹ ':'🎲 '}<b>${s.name}</b> <small>${s.desc}</small><br><small>${has?'Owned':s.price+(s.cur=='chips'?' ♠ chips':' Rs')}</small></span><button class='sm' data-k='${k}' ${on?'disabled':''}>${on?'Using':has?'Use':'Buy'}</button></div>`};
+  return `<div class='row'><span>${k=='chip'?'♠ ':k=='gold'?'🥇 ':k=='silver'?'🥈 ':k=='ruby'?'♦️ ':k=='diamond'?'💎 ':k=='royal'?'₹ ':'🎲 '}<b>${s.name}</b> <small>${s.desc}</small><br><small>${has?'Owned':s.price+(s.cur=='chips'?' ♠ chips':' Rs')}</small></span><button class='sm' data-k='${k}' ${on?'disabled':''}>${on?'Using':has?'Use':'Buy'}</button></div>`};
  const render=()=>{c.innerHTML=`<div class='cd tc'><h2>🎲 Ludo</h2><p>Classic Ludo · bring all 4 tokens home to win</p></div>
  <div class='cd'><h3>👥 Players</h3><div class='tabs' id='lmodes'><button data-m='2' class='${mode==2?'on':''}'>1v1 · 2 Players</button><button data-m='3' class='${mode==3?'on':''}'>3 Players</button><button data-m='4' class='${mode==4?'on':''}'>2v2 · 4 Players</button></div></div>
  <div class='cd' style='border-color:#22c55e'><h3>🆓 Free Table</h3><p>Free entry · Win <b>+20 coins</b></p><button class='b' id='ltf'>Play Free</button></div>
@@ -542,8 +555,8 @@ const LU_TONE={R:['#fca5a5','#ef4444','#991b1b'],G:['#86efac','#22c55e','#166534
 const LU_GOLD=['#fef9c3','#f59e0b','#92400e'];
 function luPawnSVG(color,skin,uid){const t=LU_TONE[color],g=LU_GOLD;
  const body=t[1],dark=t[2],light=t[0]; // pawn body is ALWAYS the player's own color — skins only add accents
- const med=skin=='chip'?['#1e293b','#ffd23f','♠']:skin=='gold'?['#ffffff',t[1],'★']:skin=='royal'?['#ffffff','#b45309','₹']:null;
- const ring=(skin=='gold'||skin=='royal')?'#ffd23f':'#ffffff'; // gold trim ring for Gold + Royal skins
+ const med=skin=='chip'?['#1e293b','#ffd23f','♠']:skin=='gold'?['#ffffff',t[1],'★']:skin=='silver'?['#e2e8f0','#64748b','✦']:skin=='ruby'?['#dc2626','#ffffff','♦']:skin=='diamond'?['#e0f2fe','#0284c7','✦']:skin=='royal'?['#ffffff','#b45309','₹']:null;
+ const ring=skin=='gold'||skin=='royal'?'#ffd23f':skin=='silver'?'#e2e8f0':skin=='ruby'?'#dc2626':skin=='diamond'?'#7dd3fc':'#ffffff'; // trim ring matches the skin accent — pawn body is always the player's own color
  return `<svg viewBox='0 0 100 100'><defs><linearGradient id='pg${uid}' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${light}'/><stop offset='.55' stop-color='${body}'/><stop offset='1' stop-color='${dark}'/></linearGradient></defs><ellipse cx='50' cy='88' rx='36' ry='10' fill='${ring}' stroke='rgba(0,0,0,.3)' stroke-width='2'/><path d='M50 26 C62 36 67 50 69 64 C70 76 66 84 50 84 C34 84 30 76 31 64 C33 50 38 36 50 26 Z' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><circle cx='50' cy='20' r='14' fill='url(#pg${uid})' stroke='${dark}' stroke-width='2'/><ellipse cx='43' cy='14' rx='5' ry='3.5' fill='rgba(255,255,255,.85)' transform='rotate(-20 43 14)'/><ellipse cx='39' cy='56' rx='8' ry='13' fill='rgba(255,255,255,.32)' transform='rotate(-16 39 56)'/>${med?`<circle cx='50' cy='60' r='13' fill='${med[0]}' stroke='rgba(0,0,0,.25)' stroke-width='1.5'/><text x='50' y='66' text-anchor='middle' font-size='16' font-weight='900' fill='${med[1]}'>${med[2]}</text>`:''}</svg>`}
 function luMakeTokens(){const b=$('ldb');if(!b)return;
  LU.players.forEach((pl,pi)=>{pl.tokens.forEach((_,ti)=>{const el=document.createElement('div');el.className='tk';el.id='ltk-'+pi+'-'+ti;
@@ -583,7 +596,7 @@ const LU_PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]
 const LU_PIP_COLORS=['#ef4444','#f59e0b','#22c55e','#ec4899','#dc2626','#14b8a6','#a855f7','#fb923c','#eab308']; // colorful pips — readable on both the blue and the white die (centre pip stays red, like the old red 1-pip)
 function luSetDice(v,skin,el,blue){const d=el||null;if(!d)return;
  d.innerHTML=Array.from({length:9},(_,i)=>{const on=LU_PIPS[v].includes(i);const col=on&&skin=='classic'?LU_PIP_COLORS[i]:null;return `<u class='${on?'on':''}'${col?` style='--dd:${col}'`:''}></u>`}).join('');
- const st={classic:blue?'--dd:#ffffff;border-color:#3b82f6;background:radial-gradient(circle at 30% 25%,#60a5fa,#2563eb 55%,#1e40af)':'--dd:#1e40af;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#ffffff,#f8fafc 40%,#e2e8f0 72%,#cbd5e1)',chip:'--dd:#ffd23f;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#64748b,#0f172a 55%,#020617)',gold:'--dd:#451a03;border-color:#fff7cc;background:radial-gradient(circle at 30% 25%,#fef9c3,#f59e0b 55%,#b45309)',royal:'--dd:#7f1d1d;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#fde68a,#d97706 50%,#92400e)'};
+ const st={classic:blue?'--dd:#ffffff;border-color:#3b82f6;background:radial-gradient(circle at 30% 25%,#60a5fa,#2563eb 55%,#1e40af)':'--dd:#1e40af;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#ffffff,#f8fafc 40%,#e2e8f0 72%,#cbd5e1)',chip:'--dd:#ffd23f;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#64748b,#0f172a 55%,#020617)',gold:'--dd:#451a03;border-color:#fff7cc;background:radial-gradient(circle at 30% 25%,#fef9c3,#f59e0b 55%,#b45309)',silver:'--dd:#1e293b;border-color:#e2e8f0;background:radial-gradient(circle at 30% 25%,#f8fafc,#cbd5e1 55%,#64748b)',ruby:'--dd:#ffffff;border-color:#fca5a5;background:radial-gradient(circle at 30% 25%,#fca5a5,#dc2626 55%,#7f1d1d)',diamond:'--dd:#0c4a6e;border-color:#e0f2fe;background:radial-gradient(circle at 30% 25%,#f0f9ff,#7dd3fc 55%,#0284c7)',royal:'--dd:#7f1d1d;border-color:#ffd23f;background:radial-gradient(circle at 30% 25%,#fde68a,#d97706 50%,#92400e)'};
  d.style.cssText=st[skin]||st.classic}
 function luRollAnim(final,cb,el,blue){const d=el;const g=LU?LU.gid:0;if(d)d.classList.add('go');let n=0;
  const t=setInterval(()=>{if(!LU||LU.gid!==g||!d||!d.isConnected){clearInterval(t);return}luSetDice(1+Math.floor(Math.random()*6),LU.skin,d,blue);
@@ -703,11 +716,11 @@ function payFlow(item,amt,done){const m=$('mo'),MT=['JazzCash','Easypaisa','Card
   $('pd').onclick=()=>{m.style.display='none';done()}};
  s1()}
 function shop(){const v=vipOn(),q=s=>document.querySelectorAll(s),ow=k=>S.own[k]||(S.own[k]=[]);
- $('gc').innerHTML=`<div class='cd' style='background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff'><h3>👑 VIP Pass · 30 days</h3><p>Blue verified badge next to your name, gold crown, gold avatar frame and the Gold striker skin. VIP does not change your coin earnings.</p>${v?`<p><b>Active until ${new Date(S.vip).toLocaleDateString()}</b></p>`:`<button class='b' id='vb' style='background:#fff'>Rs 500 · Buy VIP (demo)</button>`}</div>
+ $('gc').innerHTML=`<div class='cd' style='background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff'><h3>👑 VIP Pass · 30 days</h3><p>Blue verified badge next to your name, gold crown, gold avatar frame and the Gold striker skin. Plus <b>+1000 ♠ chips</b>. VIP does not change your coin earnings.</p>${v?`<p><b>Active until ${new Date(S.vip).toLocaleDateString()}</b></p>`:`<button class='b' id='vb' style='background:#fff'>Rs 500 · Buy VIP (demo)</button>`}</div>
  <div class='cd'><h3>🎭 Avatars</h3><p>Pay with coins.</p>${AVS.map((a,i)=>`<div class='row'><span style='font-size:28px;flex:none'>${a[0]}</span><span>${a[1]} 🪙</span><button class='sm' data-a='${i}' ${ow('av').includes(a[0])?'disabled':''}>${ow('av').includes(a[0])?'Owned':'Buy'}</button></div>`).join('')}</div>
  <div class='cd'><h3>🎲 Striker skins</h3>${[['w','Classic',0],['g','Gold',150],['n','Neon',200]].map(d=>{const has=d[2]==0||ow('dice').includes(d[0])||(d[0]=='g'&&v),on=(S.dice||'w')==d[0];return `<div class='row'><span><i class='sw' style='background:${DSK[d[0]][0]}'></i>${d[1]}${has?'':' · '+d[2]+' 🪙'}</span><button class='sm' data-d='${d[0]}' data-p='${d[2]}' ${on?'disabled':''}>${on?'Using':has?'Use':'Buy'}</button></div>`}).join('')}</div>
  ${(S.rcpt||[]).length?`<div class='cd'><h3>🧾 Purchases</h3>${S.rcpt.slice(-5).reverse().map(r=>`<div class='row'><span>${r.i}<br><small>${r.d} · ${r.id}</small></span><b>Rs ${r.a}</b></div>`).join('')}</div>`:''}<p class='ft'>Items are for fun only. Purchases never add to your cash balance.</p>`;
- if($('vb'))$('vb').onclick=()=>payFlow('VIP Pass · 30 days',500,()=>{S.vip=Date.now()+30*864e5;save();hdr();shop()});
+ if($('vb'))$('vb').onclick=()=>payFlow('VIP Pass · 30 days',500,()=>{S.vip=Date.now()+30*864e5;S.chips=(S.chips||0)+1000;save();hdr();shop()});
  q('.sm[data-a]').forEach(b=>b.onclick=()=>{const a=AVS[+b.dataset.a];if(S.coins<a[1]){b.textContent='Need coins';return}S.coins-=a[1];ow('av').push(a[0]);S.av=a[0];save();hdr();shop()});
  q('.sm[data-d]').forEach(b=>b.onclick=()=>{const d=b.dataset.d,p=+b.dataset.p,has=p==0||ow('dice').includes(d)||(d=='g'&&vipOn());if(!has){if(S.coins<p){b.textContent='Need coins';return}S.coins-=p;ow('dice').push(d)}S.dice=d;save();hdr();shop()})}
 // ---- Wallet ----
