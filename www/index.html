@@ -213,7 +213,9 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(
 .spb:disabled{opacity:.8}
 .spt{margin-top:14px;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-weight:700;border-radius:12px;padding:10px;font-size:15px}
 /* Home fill: spread sections down the screen so no big white gap is left */
-.hm{display:flex;flex-direction:column;justify-content:space-evenly;min-height:calc(100vh - 200px);min-height:calc(100dvh - 200px)}.hm .hgr{flex:1}
+.hm{display:flex;flex-direction:column;justify-content:space-evenly;gap:10px;min-height:calc(100vh - 170px);min-height:calc(100dvh - 170px)}.hm .hgr{flex:1}.hm .ft{margin-top:0}
+/* With the AdMob banner up, the nav sits 50px higher — shrink .hm the same amount so the footer never slides under it */
+body.has-banner .hm{min-height:calc(100vh - 185px);min-height:calc(100dvh - 185px)}
 /* VIP Pass banner — full width, solid blue, big white VIP PASS */
 .vipb{border:0;border-radius:20px;padding:16px 12px;background:#1565C0;color:#fff;text-align:center;box-shadow:0 6px 0 rgba(0,0,0,.25);width:100%;cursor:pointer}
 .vipb b{display:block;font-size:26px;font-weight:900;letter-spacing:2px;color:#fff}
