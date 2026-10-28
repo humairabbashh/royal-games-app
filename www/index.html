@@ -30,6 +30,17 @@ body{background:#f8fafc;color:#111827;font-family:system-ui,-apple-system,"Segoe
 .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.08)}.row:last-child{border:0}.row span{flex:1;font-size:14px}
 .sm{padding:8px 12px;border:0;border-radius:10px;background:var(--g);color:#3b1d00;font-weight:800;text-decoration:none;font-size:13px}.sm:disabled{opacity:.4}
 .back{width:auto;padding:8px 16px;margin:0 0 10px;font-size:14px;background:rgba(0,0,0,.08);box-shadow:none;color:#111827}
+/* ---- Videos tab: pink Watch & Earn screen (scoped to .vids-pink only) ---- */
+.vids-pink{background:linear-gradient(180deg,#fbcfe8,#f9a8d4);border-radius:20px;padding:14px 12px 20px;margin:0 -12px;min-height:calc(100vh - 190px);min-height:calc(100dvh - 190px)}
+.vids-pink h2{color:#4c1d95;font-size:30px;font-weight:800;margin:10px 2px 6px}
+.vids-pink .vd{color:#7e2257;font-size:15px;line-height:1.5;margin:0 2px 16px}
+.vcard{background:#fff;border-radius:20px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:12px;box-shadow:0 4px 14px rgba(190,24,93,.14)}
+.vthumb{width:110px;height:80px;border-radius:14px;object-fit:cover;flex:none;background:#f3e8ff}
+.vlock{width:110px;height:80px;border-radius:14px;background:#f3d9ec;display:flex;align-items:center;justify-content:center;font-size:30px;flex:none}
+.vcard .vt{flex:1;min-width:0}
+.vcard .vt b{font-size:17px;color:#111827}
+.vcard .vt small{display:block;color:#6b7280;font-size:13px;margin-top:4px;line-height:1.45}
+.vcard .sm{flex:none;padding:12px 18px;border-radius:14px;background:linear-gradient(180deg,#fb923c,#f97316);color:#fff;font-size:15px;box-shadow:0 4px 10px rgba(249,115,22,.4)}
 .dg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:10px 0}.dy{background:rgba(0,0,0,.05);border-radius:10px;padding:6px 0;text-align:center;font-size:10px;border:2px solid transparent}.dy b{display:block;font-size:15px}.dy.dn{background:#15803d}.dy.td{border-color:var(--g);animation:pl 1s infinite}.dy.bn2{background:#be185d}@keyframes pl{50%{transform:scale(1.08)}}
 nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:calc(100% - 16px);max-width:456px;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:26px;padding:6px;display:flex;box-shadow:0 10px 28px rgba(0,0,0,.15);z-index:40}
 body.has-banner nav{bottom:calc(62px + env(safe-area-inset-bottom,0px))}
@@ -225,7 +236,7 @@ body.has-banner .hm{min-height:calc(100vh - 185px);min-height:calc(100dvh - 185p
 <nav id="nv"><button data-t="home">🏠 Home</button><button data-t="mis">🎯 Missions</button><button data-t="fc">♠ Free chips</button><button data-t="vids">🎬 Videos</button><button data-t="inv">🤝 Invite</button><button data-t="wal">👛 Wallet</button></nav>
 <div id="gs"></div><div class="mo" id="mo"></div>
 <script>
-const CFG={yt:'https://youtube.com/@earningdecode-786',wa:'https://whatsapp.com/channel/0029VbDkN2e2975KAjrMOS1W',mail:'Humairabbashk@gmail.com',app:'',follow:50,adC:10,vidC:10,vidS:60,refB:200,frB:50,dayCap:40,per:50,minWd:300,chipPer:10,
+const CFG={yt:'https://youtube.com/@earningdecode-786',wa:'https://whatsapp.com/channel/0029VbDkN2e2975KAjrMOS1W',mail:'Humairabbashk@gmail.com',app:'',follow:50,adC:10,vidC:50,vidS:60,refB:200,frB:50,dayCap:40,per:50,minWd:300,chipPer:10,
  vids:[['Earn Free Earning App','https://youtu.be/sT8AXNebG8Y'],...Array.from({length:9},(_,i)=>['Video '+(i+2),''])]};
 const DEF=()=>({own:{av:[],th:[]},vip:0,theme:'g',dchip:'',ludoSkins:['classic'],ludoSkin:'classic',coins:50,chips:500,pkr:0,mn_en:10,wd:[],acc:{m:'JazzCash',t:'',n:''},nm:'Player',av:'🦁',snd:true,spin:0,ci:'',stk:0,ads:0,vw:{},f:{},rc:'',used:'',st:{},cl:{},de:{d:'',n:0}});
 let S=DEF(),UID=null,curG='';try{UID=localStorage.getItem('rg_sess')}catch(e){}
@@ -683,14 +694,15 @@ let pend=null,vp=null;
 function fin(k){if(!pend||pend.k!=k)return;clearTimeout(pend.tm);pend=null;S.f[k]=1;add(CFG.follow);if(tab=='vids')vids()}
 function stJ(k){if(S.f[k]||pend)return;pend={k,at:Date.now()};pend.tm=setTimeout(()=>fin(k),12000);if(tab=='vids')vids()}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pend&&Date.now()-pend.at>4000)fin(pend.k)});
-function vids(){const fo=(k,ic,t)=>`<a class='b ${S.f[k]?'':'p'} lk' data-k='${k}' href='${CFG[k]}' target='_blank' rel='noopener'>${ic} ${t} ${S.f[k]?'✓ Joined':pend&&pend.k==k?'· Joining…':'· +'+CFG.follow+' 🪙'}</a>`;
- let h=`<button class='b back' id='bk'>← Back</button><h3 class='h3'>🎬 Videos & Channels</h3><div class='cd'><b>Follow & earn</b>${fo('yt','▶️','YouTube')}${fo('wa','💬','WhatsApp Channel')}</div><div class='cd'><b>Watch & earn</b><p>Watch each video for a full minute (${CFG.vidS}s), come back and claim +${CFG.vidC} 🪙 (once per video).</p>`;
- CFG.vids.forEach((v,i)=>{const dn=S.vw[i],pd=vp&&vp.i==i;h+=`<div class='row'><span>${v[0]}<br><small>${v[1]?(dn?'Completed':'+'+CFG.vidC+' coins'):'Coming soon'}</small></span>${v[1]&&!dn&&!pd?`<a class='sm' data-i='${i}' href='${v[1]}' target='_blank' rel='noopener'>Watch</a>`:`<button class='sm' data-i='${i}' ${v[1]&&!dn?'':'disabled'}>${dn?'Done':'Claim'}</button>`}</div>`});
+function ytThumb(u){if(!u)return null;const m=String(u).match(/(?:youtu\.be\/|youtube\.com\/watch\?[^#]*v=)([\w-]{11})/);return m?'https://i.ytimg.com/vi/'+m[1]+'/hqdefault.jpg':null}
+function vids(){const td=new Date().toDateString();
+ let h=`<div class='vids-pink'><button class='b back' id='bk'>← Back</button><h2>Watch &amp; Earn</h2><p class='vd'>Tap Watch — the video opens in YouTube. Stay ${CFG.vidS} seconds, come back and claim ${CFG.vidC} coins. One claim per video, per day.</p>`;
+ // locked rows keep a hidden .sm so the countdown lookup [vp.i] stays aligned with CFG.vids
+ CFG.vids.forEach((v,i)=>{const dn=S.vw[i]===td,pd=vp&&vp.i==i,th=ytThumb(v[1]);h+=`<div class='vcard'>${th?`<img class='vthumb' src='${th}' alt=''>`:`<div class='vlock'>🔒</div>`}<span class='vt'><b>Video ${i+1}</b><small>${v[1]?(dn?'Completed ✓':'Watch '+CFG.vidS+'s on YouTube • +'+CFG.vidC+' coins • once a day'):'Coming soon'}</small></span>${v[1]?(v[1]&&!dn&&!pd?`<a class='sm' data-i='${i}' href='${v[1]}' target='_blank' rel='noopener'>Watch</a>`:`<button class='sm' data-i='${i}' ${v[1]&&!dn?'':'disabled'}>${dn?'Done':'Claim'}</button>`):`<button class='sm' style='display:none' data-i='${i}' disabled></button>`}</div>`});
  $('mn').innerHTML=h+'</div>';
  $('bk').onclick=()=>go('home');
- document.querySelectorAll('.lk').forEach(a=>a.onclick=()=>{stJ(a.dataset.k);chk(a.href)});
- document.querySelectorAll('.row .sm').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,v=CFG.vids[i];if(vp&&vp.i==i){if(Date.now()-vp.at>=CFG.vidS*1000){S.vw[i]=1;vp=null;add(CFG.vidC);vids()}}else{vp={i,at:Date.now()};chk(v[1]);setTimeout(vids,400)}});
- clearInterval(window.vtm);if(vp){const b=[...document.querySelectorAll('.row .sm')][vp.i];window.vtm=setInterval(()=>{if(!b||!b.isConnected||!vp||tab!='vids'){clearInterval(window.vtm);return}const r=Math.ceil((CFG.vidS*1000-(Date.now()-vp.at))/1000);b.textContent=r>0?'Wait '+r+'s':'Claim';if(r<=0)clearInterval(window.vtm)},500)}}
+ document.querySelectorAll('.vcard .sm').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,v=CFG.vids[i];if(vp&&vp.i==i){if(Date.now()-vp.at>=CFG.vidS*1000){S.vw[i]=new Date().toDateString();vp=null;add(CFG.vidC);vids()}}else{vp={i,at:Date.now()};chk(v[1]);setTimeout(vids,400)}});
+ clearInterval(window.vtm);if(vp){const b=[...document.querySelectorAll('.vcard .sm')][vp.i];window.vtm=setInterval(()=>{if(!b||!b.isConnected||!vp||tab!='vids'){clearInterval(window.vtm);return}const r=Math.ceil((CFG.vidS*1000-(Date.now()-vp.at))/1000);b.textContent=r>0?'Wait '+r+'s':'Claim';if(r<=0)clearInterval(window.vtm)},500)}}
 // ---- Invite ----
 let RF='';try{const mm=location.hash.match(/ref-([A-Za-z0-9]{7})/);if(mm)RF=mm[1].toUpperCase()}catch(e){}
 if(RF){try{localStorage.setItem('rg_ref',RF)}catch(e){}}else{try{RF=localStorage.getItem('rg_ref')||''}catch(e){}}
