@@ -243,7 +243,59 @@ let S=DEF(),UID=null,curG='';try{UID=localStorage.getItem('rg_sess')}catch(e){}
 const key=()=>UID?'rg_'+UID:'rg';
 function loadS(){S=DEF();try{Object.assign(S,JSON.parse(localStorage.getItem(key())||'{}'))}catch(e){}if(!S.rc)S.rc='RG'+Math.random().toString(36).slice(2,7).toUpperCase().padEnd(5,'X')}
 loadS();
-const save=()=>{try{localStorage.setItem(key(),JSON.stringify(S))}catch(e){}};
+const saveLocal=()=>{try{localStorage.setItem(key(),JSON.stringify(S))}catch(e){}};
+const save=()=>{saveLocal();syncPush()};
+// ---- Firebase sync (RTDB REST, test-mode rules; the game NEVER blocks on it) ----
+const FB='https://royal-games-admin-default-rtdb.asia-southeast1.firebasedatabase.app';
+const SYNC={uid:null,ready:false,settings:null,spinList:null,coinChunk:1000,gamesOff:[],vids:null,maint:false,maintMsg:'',ann:''};
+let VIP_PRICE=500,VIP_CHIPS=1000,FREE_CHIPS=200,MN_FAIL=1,MN_CHIP=50;
+try{SYNC.uid=localStorage.getItem('rg_uid')}catch(e){}
+if(!SYNC.uid){SYNC.uid='rg_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);try{localStorage.setItem('rg_uid',SYNC.uid)}catch(e){}}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fbJ=r=>{try{return JSON.parse(r)}catch(e){return null}};
+function fbGet(p,ms){return new Promise(res=>{let done=false;const t=setTimeout(()=>{if(!done){done=true;res(null)}},ms||4000);fetch(FB+p+'.json').then(r=>r.text()).then(t=>{if(!done){done=true;clearTimeout(t);res(fbJ(t))}}).catch(()=>{if(!done){done=true;clearTimeout(t);res(null)}})})}
+function fbWrite(p,body,method){const send=retry=>{fetch(FB+p+'.json',{method:method||'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).catch(()=>{if(retry)setTimeout(()=>send(false),3000)})};try{send(true)}catch(e){}}
+function syncPush(){if(!SYNC.ready||!SYNC.uid)return;fbWrite('/users/'+SYNC.uid,{coins:S.coins,chips:S.chips,pkr:S.pkr,mn_en:S.mn_en,lastSeen:Date.now(),refCode:S.rc,ludoWins:(S.st&&S.st.lu)||0,minesWins:(S.st&&S.st.mnw)||0},'PATCH')}
+function syncOnLogin(){if(!UID||!SYNC.uid)return;fbGet('/users/'+SYNC.uid,5000).then(rec=>{
+ if(rec&&typeof rec==='object'){
+  if(rec.username&&rec.username!==UID){SYNC.ready=false;return}
+  if(typeof rec.coins==='number')S.coins=rec.coins;
+  if(typeof rec.chips==='number')S.chips=rec.chips;
+  if(typeof rec.pkr==='number')S.pkr=rec.pkr;
+  saveLocal();hdr();
+ }else{
+  if(typeof navigator!=='undefined'&&navigator.onLine===false){SYNC.ready=true;return}
+  const us=usersG()[UID]||{};
+  fbWrite('/users/'+SYNC.uid,{name:S.nm,username:UID,password:us.h||'',salt:us.s||'',coins:S.coins,chips:S.chips,pkr:S.pkr,mn_en:S.mn_en,refCode:S.rc,status:'active',createdAt:Date.now(),lastSeen:Date.now()},'PUT');
+ }
+ SYNC.ready=true})}
+function syncWithdrawal(r){if(!SYNC.uid)return;const k='wd_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);fbWrite('/withdrawals/'+k,r,'PUT')}
+function syncSettings(){fbGet('/settings',5000).then(st=>{
+ if(!st||typeof st!=='object')st={};
+ SYNC.settings=st;
+ if(typeof st.dayCap==='number')CFG.dayCap=st.dayCap;
+ if(typeof st.adReward==='number')CFG.adC=st.adReward;
+ if(typeof st.videoReward==='number')CFG.vidC=st.videoReward;
+ if(typeof st.referrerBonus==='number')CFG.refB=st.referrerBonus;
+ if(typeof st.refereeBonus==='number')CFG.frB=st.refereeBonus;
+ if(typeof st.minWithdraw==='number')CFG.minWd=st.minWithdraw;
+ if(st.vip&&typeof st.vip==='object'){if(typeof st.vip.priceRs==='number')VIP_PRICE=st.vip.priceRs;if(typeof st.vip.chipsGrant==='number')VIP_CHIPS=st.vip.chipsGrant}
+ if(typeof st.freeChipsDaily==='number')FREE_CHIPS=st.freeChipsDaily;
+ if(typeof st.coinRate==='number'&&st.coinRate>0)SYNC.coinChunk=st.coinRate;
+ if(st.spinPrizes&&Array.isArray(st.spinPrizes.coins)&&Array.isArray(st.spinPrizes.chips)&&Array.isArray(st.spinPrizes.pkr)&&st.spinPrizes.coins.length>=4&&st.spinPrizes.chips.length>=2&&st.spinPrizes.pkr.length>=2){
+  const c=st.spinPrizes.coins,h=st.spinPrizes.chips,r=st.spinPrizes.pkr;
+  SYNC.spinList=[['c',c[0],'🪙 '+c[0]],['h',h[0],'♠ '+h[0]],['c',c[1],'🪙 '+c[1]],['r',r[0],'Rs '+r[0]],['h',h[1],'♠ '+h[1]],['c',c[2],'🪙 '+c[2]],['r',r[1],'Rs '+r[1]],['c',c[3],'🪙 '+c[3]]];
+ }
+ if(st.mines&&typeof st.mines==='object'){if(typeof st.mines.winReward==='number')MN_WIN=st.mines.winReward;if(typeof st.mines.failEnergyLoss==='number')MN_FAIL=st.mines.failEnergyLoss;if(typeof st.mines.chipsPerEnergy==='number')MN_CHIP=st.mines.chipsPerEnergy}
+ if(st.app&&typeof st.app.announcement==='string')SYNC.ann=st.app.announcement;
+ if(st.maintenance===true){SYNC.maint=true;SYNC.maintMsg=typeof st.maintenanceMsg==='string'?st.maintenanceMsg:'Game maintenance mein hai. Thodi der baad dobara try karo.'}
+ try{if(st.ludo&&Array.isArray(st.ludo.skins)){const idm={classic:'classic',chip:'chip',gold:'gold',silver:'silver',ruby:'ruby',diamond:'diamond',rsroyal:'royal'};st.ludo.skins.forEach(sk=>{const k=idm[sk.id];if(k&&LU_SKINS[k]){if(typeof sk.costRs==='number'){LU_SKINS[k].price=sk.costRs;LU_SKINS[k].cur='pkr'}else if(typeof sk.costChips==='number'){LU_SKINS[k].price=sk.costChips;LU_SKINS[k].cur='chips'}}})}}catch(e){}
+ try{if(st.gamesEnabled&&typeof st.gamesEnabled==='object'){const gm={ludo:'ludo',mines:'mines',tictactoe:'tt',snake:'sn',memory:'mm','2048':'g24'};SYNC.gamesOff=Object.keys(gm).filter(k=>st.gamesEnabled[k]===false).map(k=>gm[k])}}catch(e){}
+ fbGet('/videos',5000).then(vs=>{
+  if(vs&&typeof vs==='object'){const list=Object.keys(vs).sort().map(k=>vs[k]).filter(v=>v&&v.active&&v.youtubeId).map(v=>({t:String(v.title||'Video'),u:'https://youtu.be/'+String(v.youtubeId),r:(typeof v.reward==='number'?v.reward:CFG.vidC)}));if(list.length)SYNC.vids=list}
+  try{if(Array.isArray(st.navOrder)){const nav=$('nv');if(nav){const btns={};nav.querySelectorAll('button').forEach(b=>btns[b.dataset.t]=b);const mp={home:'home',missions:'mis',freechips:'fc',videos:'vids',invite:'inv',wallet:'wal'};const keys=st.navOrder.map(k=>mp[k]).filter(k=>k&&btns[k]);if(keys.length===6&&new Set(keys).size===6)keys.forEach(k=>nav.appendChild(btns[k]))}}}catch(e){}
+  if(tab==='home'&&!curG)home();
+ })})}
 const $=i=>document.getElementById(i);
 const stat=(k,v)=>{S.st[k]=(S.st[k]||0)+(v===undefined?1:v)};
 function hdr(){document.documentElement.dataset.th=S.theme||'g';$('hd').innerHTML=`<div class='av' style='${vipOn()?'border-color:#ffd23f;box-shadow:0 0 0 3px #ffd23f66':''}'>${S.av}</div><div class='nm'>${vipOn()?'👑 ':''}${S.nm}${S.cup?' 🏆':''}${vipOn()?' '+vtb(16):''}<small>${vipOn()?'👑 VIP · ':''}♠ ${S.chips} chips</small></div><div class='cn'>🪙 ${S.coins}</div><button class='ib' id='stb'>⚙️</button>`;$('stb').onclick=setM;const g=$('gc2');if(g)g.textContent=gcT()}
@@ -296,7 +348,7 @@ function go(t){tab=t;if(t!='earn')scr='hub';navHi(t);({home,mis:missions,earn,vi
 document.querySelectorAll('#nv button').forEach(b=>b.onclick=()=>go(b.dataset.t));
 function home(){
  $('mn').innerHTML=`<div class='hm'>
- <button id='vpb' class='vipb'><b>👑 VIP PASS</b><small>Rs 500 · 30 days · Verified badge + Gold striker + 1000 ♠ chips</small></button>
+ <button id='vpb' class='vipb'><b>👑 VIP PASS</b><small>Rs ${VIP_PRICE} · 30 days · Verified badge + Gold striker + ${VIP_CHIPS} ♠ chips</small></button>
  <button class='gt' id='shp' style='display:flex;align-items:center;justify-content:center;gap:10px;font-size:17px;padding:12px;background:linear-gradient(135deg,#a855f7,#7c3aed)'><span style='display:inline;font-size:22px;margin:0'>🛍️</span>Shop</button>
 <div class='hgr'><div class='hcol'><button class='gt' data-s='spin' style='background:#000;color:#fff'><span><svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='#fff' stroke-width='1.8' stroke-linecap='round'><circle cx='12' cy='12' r='8.5'/><circle cx='12' cy='12' r='2'/><path d='M12 3.5v17M3.5 12h17M6 6l12 12M18 6L6 18'/></svg></span>Spin</button><button class='gt' data-g='mm' style='background:linear-gradient(135deg,#11998e,#38ef7d)'><span>🧠</span>Memory Match<small>Free · win coins</small></button>
 <button class='gt' data-g='g24' style='background:linear-gradient(135deg,#f7971e,#ffd200);color:#3b1d00'><span>🔢</span>2048<small>Free · win coins</small></button>
@@ -307,6 +359,10 @@ function home(){
 <button class='gt' data-g='tt' style='background:linear-gradient(135deg,#4776e6,#8e54e9)'><span>⭕❌</span>Tic-Tac-Toe<small>Free · beat the bot</small></button>
 <button class='gt' data-f='wa' style='background:linear-gradient(135deg,#22c55e,#15803d)'><span>💬</span>WhatsApp<small>${S.f.wa?'✓ Joined':'+50 🪙'}</small></button></div></div>
 <p class='ft'>Games are free to play. Coins can be converted to PKR in the Wallet.</p></div>`;
+ if(SYNC.ann){const hm=document.querySelector('.hm');if(hm)hm.insertAdjacentHTML('afterbegin',`<div class='cd' style='background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:#f59e0b'><b>📢 ${esc(SYNC.ann)}</b></div>`)}
+ if(SYNC.maint){const hm=document.querySelector('.hm');if(hm)hm.insertAdjacentHTML('afterbegin',`<div class='cd' style='background:#dc2626;color:#fff'><b>🔧 ${esc(SYNC.maintMsg)}</b></div>`)}
+ if(SYNC.gamesOff.length)document.querySelectorAll('.gt[data-g]').forEach(b=>{if(SYNC.gamesOff.includes(b.dataset.g))b.style.display='none'});
+ if(SYNC.maint)document.querySelectorAll('.gt[data-g],.gt[data-s],.gt[data-f],#vpb,#shp').forEach(b=>b.disabled=true);
  $('vpb').onclick=()=>openGame('shop');$('shp').onclick=()=>openGame('shop');
  document.querySelectorAll('.gt[data-g]').forEach(b=>b.onclick=()=>openGame(b.dataset.g));
  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const k=b.dataset.f;if(S.f[k])return;stJ(k);chk(CFG[k]);setTimeout(()=>{if(tab=='home')home()},13000)});
@@ -353,7 +409,7 @@ function ttt(){const c=$('gc');let b=Array(9).fill(''),ov=false,res='';
   c.querySelectorAll('.tc2').forEach(k=>k.onclick=()=>{const i=+k.dataset.i;if(ov||b[i])return;b[i]='X';beep(500);if(!fin()){bot();fin()}rd()});if($('tn'))$('tn').onclick=ttt};rd()}
 // ---- Mines ----
 const DSK={w:['#ffffff','#111111'],g:['#ffd23f','#3b1d00'],n:['#22d3ee','#083344']}; // striker skin colours — used by Shop
-const MN_ROWS=5,MN_COLS=6,MN_BOXES=30,MN_MINES=5,MN_OPENS=5,MN_WIN=10;
+const MN_ROWS=5,MN_COLS=6,MN_BOXES=30,MN_MINES=5,MN_OPENS=5;let MN_WIN=10;
 let MN=null;
 function mnNewBoard(){const idx=Array.from({length:MN_BOXES},(_,i)=>i);
  for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=idx[i];idx[i]=idx[j];idx[j]=t}
@@ -399,11 +455,11 @@ function mines(){const c=$('gc');let lv=1,firstRender=true,refilling=false;MN=mn
    ()=>{refilling=false;setStatus('📺 Ad nahi chala','Dobara try karo.')})};
  // chips refill: 50 chips = +1 energy (capped at 10); returns true if bought
  const buyEnergyChips=subEl=>{if(en()>=10){const s=$(subEl);if(s)s.innerHTML='✅ Energy pehle se <b>10/10 full</b> hai!';return false}
-  if(S.chips<50){const s=$(subEl);if(s)s.innerHTML='⚠️ <b>Chips kam hain!</b> Tumhare paas 50 chips nahi hain. Ad dekho ya chips kamao.';return false}
-  S.chips-=50;S.mn_en=Math.min(10,en()+1);save();hdr();updHUD();sndAd();
+  if(S.chips<MN_CHIP){const s=$(subEl);if(s)s.innerHTML='⚠️ <b>Chips kam hain!</b> Tumhare paas '+MN_CHIP+' chips nahi hain. Ad dekho ya chips kamao.';return false}
+  S.chips-=MN_CHIP;S.mn_en=Math.min(10,en()+1);save();hdr();updHUD();sndAd();
   const s=$(subEl);if(s)s.innerHTML=`✅ +1 Energy! <b>Baaki: ${en()}/10</b> — aur +1 chahiye to dobara chips se lo, ya band kar ke khelo.`;
   return true};
- const showNoEnergy=()=>{showModal(`<div class="mn-big">🪫</div><h3>Energy Khatam!</h3><p id="mnne-sub">Tumhari 10 energy khatam ho gayi hai. Ek chhota sa ad dekho aur energy wapas 10/10 bhar lo, ya 50 chips se +1 energy lo.</p><button class="mn-btn mn-btn-gold" id="mnadgo">📺 Ad Dekho — Energy +10 ⚡</button><button class="mn-btn" id="mnchipsgo" style="background:#1e293b;color:#fff">♠ 50 Chips — Energy +1 ⚡</button><button class="mn-btn mn-btn-ghost" id="mnneclose">Band Karo</button>`);
+ const showNoEnergy=()=>{showModal(`<div class="mn-big">🪫</div><h3>Energy Khatam!</h3><p id="mnne-sub">Tumhari 10 energy khatam ho gayi hai. Ek chhota sa ad dekho aur energy wapas 10/10 bhar lo, ya ${MN_CHIP} chips se +1 energy lo.</p><button class="mn-btn mn-btn-gold" id="mnadgo">📺 Ad Dekho — Energy +10 ⚡</button><button class="mn-btn" id="mnchipsgo" style="background:#1e293b;color:#fff">♠ ${MN_CHIP} Chips — Energy +1 ⚡</button><button class="mn-btn mn-btn-ghost" id="mnneclose">Band Karo</button>`);
   $('mnadgo').onclick=()=>{sndClick();hideModal();refill()};
   $('mnchipsgo').onclick=()=>{sndClick();buyEnergyChips('mnne-sub')};
   $('mnneclose').onclick=()=>{sndClick();hideModal();if(en()>0){MN=mnNewBoard();render()}}};
@@ -412,7 +468,7 @@ function mines(){const c=$('gc');let lv=1,firstRender=true,refilling=false;MN=mn
  const showRefilled=()=>{showModal(`<div class="mn-big">⚡</div><h3>Energy Full!</h3><p>Energy wapas 10/10 ho gayi hai. Ab phir se khelo!</p><button class="mn-btn mn-btn-gold" id="mnplay">▶️ Khelo</button>`);
   $('mnplay').onclick=()=>{sndClick();hideModal();MN=mnNewBoard();render()}};
  // Ad-button refill choice: full refill via ad, or +1 energy for 50 chips
- const showRefillChoice=()=>{showModal(`<div class="mn-big">⚡</div><h3>Energy Bharo</h3><p id="mnrc-sub">Energy: <b>${en()}/10</b> — ad se full 10/10 bhar lo, ya 50 chips se +1 lo.</p><button class="mn-btn mn-btn-gold" id="mnrcad">📺 Ad Dekho — Energy +10 ⚡</button><button class="mn-btn" id="mnrcchips" style="background:#1e293b;color:#fff">♠ 50 Chips — Energy +1 ⚡</button><button class="mn-btn mn-btn-ghost" id="mnrcclose">Band Karo</button>`);
+ const showRefillChoice=()=>{showModal(`<div class="mn-big">⚡</div><h3>Energy Bharo</h3><p id="mnrc-sub">Energy: <b>${en()}/10</b> — ad se full 10/10 bhar lo, ya ${MN_CHIP} chips se +1 lo.</p><button class="mn-btn mn-btn-gold" id="mnrcad">📺 Ad Dekho — Energy +10 ⚡</button><button class="mn-btn" id="mnrcchips" style="background:#1e293b;color:#fff">♠ ${MN_CHIP} Chips — Energy +1 ⚡</button><button class="mn-btn mn-btn-ghost" id="mnrcclose">Band Karo</button>`);
   $('mnrcad').onclick=()=>{sndClick();hideModal();refill()};
   $('mnrcchips').onclick=()=>{sndClick();if(buyEnergyChips('mnrc-sub')&&en()>=10){hideModal();showRefilled()}};
   $('mnrcclose').onclick=()=>{sndClick();hideModal()}};
@@ -421,7 +477,7 @@ function mines(){const c=$('gc');let lv=1,firstRender=true,refilling=false;MN=mn
  const failModal=kind=>{if(en()<=0){showNoEnergy();return}
   const big=kind==='mine'?'💥':'😢';
   const p=kind==='mine'?'Tumhara dabba mine par par gaya. Board par dekho — "5" wala dabba kahan chhupa tha.':'5 tries khatam ho gayin aur "5" wala dabba nahi mila. Board par dekho wo kahan tha.';
-  showModal(`<div class="mn-big">${big}</div><h3>Level Fail!</h3><p>${p}</p><div class="mn-reward" style="color:var(--mnred)">−1 Energy ⚡ · Baaki: ${en()}/10</div><button class="mn-btn mn-btn-gold" id="mnretry">🔁 Phir Try Karo (Level ${lv})</button><button class="mn-btn mn-btn-ghost" id="mnboard">Board Dekho</button>`);
+  showModal(`<div class="mn-big">${big}</div><h3>Level Fail!</h3><p>${p}</p><div class="mn-reward" style="color:var(--mnred)">−${MN_FAIL} Energy ⚡ · Baaki: ${en()}/10</div><button class="mn-btn mn-btn-gold" id="mnretry">🔁 Phir Try Karo (Level ${lv})</button><button class="mn-btn mn-btn-ghost" id="mnboard">Board Dekho</button>`);
   $('mnretry').onclick=()=>{sndClick();hideModal();MN=mnNewBoard();render()};
   $('mnboard').onclick=()=>{sndClick();hideModal()}};
  const openBox=i=>{if(!MN||MN.over||MN.open.has(i))return;
@@ -431,8 +487,8 @@ function mines(){const c=$('gc');let lv=1,firstRender=true,refilling=false;MN=mn
    if(b){b.classList.add('mine');b.innerHTML='<span class="mn-mine-ic">💥</span>'}
    const fr=$('mnframe');if(fr){fr.classList.remove('shake');void fr.offsetWidth;fr.classList.add('shake')}
    vibrate();sndBoom();
-   MN.over=true;stat('mn');S.mn_en=Math.max(0,en()-1);save();hdr();updHUD();updPips();
-   setStatus('💥 BOOM! Mine phat gaya!','Level fail — 1 energy kam ho gayi.');
+   MN.over=true;stat('mn');S.mn_en=Math.max(0,en()-MN_FAIL);save();hdr();updHUD();updPips();
+   setStatus('💥 BOOM! Mine phat gaya!','Level fail — ${MN_FAIL} energy kam ho gayi.');
    setTimeout(()=>{if(b)b.innerHTML='<span class="mn-mine-ic">💣</span>';revealAll();failModal('mine')},750);return}
   if(i===MN.hint){
    if(b){b.classList.add('five');b.innerHTML='<span class="mn-five-badge">5</span>'}
@@ -443,8 +499,8 @@ function mines(){const c=$('gc');let lv=1,firstRender=true,refilling=false;MN=mn
   if(b){b.classList.add('open');b.innerHTML=safeFace(d,true)}
   sndSafe(d);MN.opens++;
   const left=MN_OPENS-MN.opens;updPips();
-  if(left<=0){MN.over=true;stat('mn');S.mn_en=Math.max(0,en()-1);save();hdr();updHUD();
-   setStatus('😢 5 tries khatam!','"5" wala dabba nahi mila — level fail, 1 energy kam.');
+  if(left<=0){MN.over=true;stat('mn');S.mn_en=Math.max(0,en()-MN_FAIL);save();hdr();updHUD();
+   setStatus('😢 5 tries khatam!','"5" wala dabba nahi mila — level fail, ${MN_FAIL} energy kam.');
    revealAll();setTimeout(()=>failModal('tries'),600);return}
   setStatus(d<=2?'🔥 Bohot qareeb ho!':d<=4?'👍 Qareeb ja rahe ho':'❄️ Abhi door hai',
    d<=2?`Sirf ${d} dabba door hai "5" — tries baaki: ${left}`:d<=4?`Hint number ${d} — tries baaki: ${left}`:`Hint number ${d} — doosri taraf try karo. Tries baaki: ${left}`)};
@@ -467,8 +523,8 @@ function mines(){const c=$('gc');let lv=1,firstRender=true,refilling=false;MN=mn
    <li><span>👆</span><div>Tumhe sirf <b>5 dabbe</b> open karne hain. Un 5 mein se <b>"5" wala dabba</b> dhoondna hai.</div></li>
    <li><span>🔢</span><div>Jo dabba mine nahi hai, us par <b>number</b> ayega — ye hint hai: number jitna chhota, <b>"5" wala dabba</b> utna qareeb hai.</div></li>
    <li><span>🏆</span><div><b>"5" mil gaya to WIN!</b> Tumhe <b>10 coins</b> 🪙 milenge aur agla level khul jayega.</div></li>
-   <li class="warn"><span>💣</span><div>Mine par click ho gaya, ya 5 tries khatam ho gayin aur "5" na mila — to level <b>FAIL</b>, aur <b>1 energy</b> ⚡ kam ho jayegi.</div></li>
-   <li><span>⚡</span><div>Total energy <b>10</b> hai. Energy khatam ho jaye to <b>ad dekh kar energy dobara hasil karo</b>, ya <b>50 chips ♠ se +1 energy</b> lo.</div></li>
+   <li class="warn"><span>💣</span><div>Mine par click ho gaya, ya 5 tries khatam ho gayin aur "5" na mila — to level <b>FAIL</b>, aur <b>${MN_FAIL} energy</b> ⚡ kam ho jayegi.</div></li>
+   <li><span>⚡</span><div>Total energy <b>10</b> hai. Energy khatam ho jaye to <b>ad dekh kar energy dobara hasil karo</b>, ya <b>${MN_CHIP} chips ♠ se +1 energy</b> lo.</div></li>
   </ul></div>
   <div class="mn-overlay" id="mnov"><div class="mn-modal" id="mnmodal"></div></div>
   </div>`;
@@ -661,18 +717,18 @@ function luEnd(winner,quit){if(!LU)return;LU.over=true;LU.canRoll=false;luClearH
 function luQuit(){if(!LU||LU.over)return;luEnd(null,true)}
 // ---- Missions (nav tab: all earn methods + missions, minus Spin & Check-in) ----
 function missions(){const s=S.st,M=[['Play 3 Mines levels',(s.mn||0)>=3,30,'i',Math.min(s.mn||0,3)+'/3'],['Win a Mines level',(s.mnw||0)>=1,40,'k',Math.min(s.mnw||0,1)+'/1'],['Win a Ludo game',(s.lu||0)>=1,30,'j',Math.min(s.lu||0,1)+'/1'],['Win a Memory Match',(s.mm||0)>=1,20,'c',Math.min(s.mm||0,1)+'/1'],['Score 10 in Snake',(s.bs||0)>=10,30,'d',Math.min(s.bs||0,10)+'/10'],['Reach 256 in 2048',(s.m24||0)>=256,40,'e',Math.min(s.m24||0,256)+'/256'],['Beat the bot in Tic-Tac-Toe',(s.ttt||0)>=1,20,'f',Math.min(s.ttt||0,1)+'/1'],['Watch 3 ads',(S.ads||0)>=3,30,'g',Math.min(S.ads||0,3)+'/3'],['Watch 10 ads',(S.ads||0)>=10,80,'h',Math.min(S.ads||0,10)+'/10']];
- $('mn').innerHTML=`<button class='b back' id='bk'>← Back</button><h3 class='h3'>🎯 Missions</h3><div class='gr'><button class='gt' data-s='ad' style='background:linear-gradient(135deg,#dc2626,#f97316)'><span>📺</span>Watch Ads<small>+${CFG.adC} 🪙 each</small></button><button class='gt' data-s='chips' style='background:linear-gradient(135deg,#d97706,#f59e0b)'><span>♠</span>Free Chips<small>Daily 200 + ads</small></button></div><div class='cd' style='margin-top:12px'><b>More ways</b><p>🎬 Watch videos and 📣 join our channels in the Videos tab, and 🤝 invite friends in the Invite tab.</p></div><div class='cd' style='margin-top:12px'><h2>🎯 Missions</h2>${M.map(x=>`<div class='row'><span>${x[0]} <small>(${x[4]})</small></span><button class='sm' data-k='${x[3]}' ${x[1]&&!S.cl[x[3]]?'':'disabled'}>${S.cl[x[3]]?'Claimed':'+'+x[2]+' 🪙'}</button></div>`).join('')}</div><p class='ft'>Coins convert to PKR in your Wallet. Game rewards are capped each day.</p>`;
+ $('mn').innerHTML=`<button class='b back' id='bk'>← Back</button><h3 class='h3'>🎯 Missions</h3><div class='gr'><button class='gt' data-s='ad' style='background:linear-gradient(135deg,#dc2626,#f97316)'><span>📺</span>Watch Ads<small>+${CFG.adC} 🪙 each</small></button><button class='gt' data-s='chips' style='background:linear-gradient(135deg,#d97706,#f59e0b)'><span>♠</span>Free Chips<small>Daily ${FREE_CHIPS} + ads</small></button></div><div class='cd' style='margin-top:12px'><b>More ways</b><p>🎬 Watch videos and 📣 join our channels in the Videos tab, and 🤝 invite friends in the Invite tab.</p></div><div class='cd' style='margin-top:12px'><h2>🎯 Missions</h2>${M.map(x=>`<div class='row'><span>${x[0]} <small>(${x[4]})</small></span><button class='sm' data-k='${x[3]}' ${x[1]&&!S.cl[x[3]]?'':'disabled'}>${S.cl[x[3]]?'Claimed':'+'+x[2]+' 🪙'}</button></div>`).join('')}</div><p class='ft'>Coins convert to PKR in your Wallet. Game rewards are capped each day.</p>`;
  document.querySelectorAll('#mn .gt[data-s]').forEach(b=>b.onclick=()=>{ret='mis';scr=b.dataset.s;sub()});
  $('bk').onclick=()=>go('home');
  $('mn').querySelectorAll('.sm').forEach(b=>b.onclick=()=>{const x=M.find(y=>y[3]==b.dataset.k);S.cl[x[3]]=1;add(x[2]);missions()})}
 // ---- Earn ----
 function earn(){if(scr!='hub')return sub();const td=new Date().toDateString();
- const t=[['spin','🎡','Daily Spin',S.spin&&Date.now()-S.spin<864e5?'Free used · ad spins':'Free spin ready!','linear-gradient(135deg,#7c3aed,#a855f7)'],['ci','📅','Daily Check-in',S.ci===td?'Done today':'Claim now!','linear-gradient(135deg,#0ea5e9,#2563eb)'],['ad','📺','Watch Ads','+'+CFG.adC+' 🪙 each','linear-gradient(135deg,#dc2626,#f97316)'],['mis','🎯','Missions','8 tasks','linear-gradient(135deg,#059669,#10b981)'],['chips','♠','Free Chips','Daily 200 + ads','linear-gradient(135deg,#d97706,#f59e0b)']];
+ const t=[['spin','🎡','Daily Spin',S.spin&&Date.now()-S.spin<864e5?'Free used · ad spins':'Free spin ready!','linear-gradient(135deg,#7c3aed,#a855f7)'],['ci','📅','Daily Check-in',S.ci===td?'Done today':'Claim now!','linear-gradient(135deg,#0ea5e9,#2563eb)'],['ad','📺','Watch Ads','+'+CFG.adC+' 🪙 each','linear-gradient(135deg,#dc2626,#f97316)'],['mis','🎯','Missions','8 tasks','linear-gradient(135deg,#059669,#10b981)'],['chips','♠','Free Chips','Daily '+FREE_CHIPS+' + ads','linear-gradient(135deg,#d97706,#f59e0b)']];
  $('mn').innerHTML=`<button class='b back' id='bk'>← Back</button><h3 class='h3'>🎁 Earn Free Coins</h3><div class='gr'>${t.map(x=>`<button class='gt' data-s='${x[0]}' style='background:${x[4]}'><span>${x[1]}</span>${x[2]}<small>${x[3]}</small></button>`).join('')}</div><div class='cd' style='margin-top:12px'><b>More ways</b><p>🎬 Watch videos and 📣 join our channels in the Videos tab, and 🤝 invite friends in the Invite tab.</p></div>
  <p class='ft'>Coins convert to PKR in your Wallet. Game rewards are capped each day.</p>`;$('bk').onclick=()=>go('home');
  document.querySelectorAll('.gt').forEach(b=>b.onclick=()=>{ret='earn';scr=b.dataset.s;earn()})}
 function sub(){const m=$('mn'),td=new Date().toDateString(),bk=`<button class='b back' id='bk'>← Back</button>`;
- if(scr=='spin'){const free=!S.spin||Date.now()-S.spin>864e5;const SP=[['c',5,'🪙 5'],['h',50,'♠ 50'],['c',10,'🪙 10'],['r',1,'Rs 1'],['h',100,'♠ 100'],['c',15,'🪙 15'],['r',2,'Rs 2'],['c',20,'🪙 20']];const cols=['#f43f5e','#f59e0b','#22c55e','#3b82f6','#a855f7','#ec4899','#14b8a6','#eab308'];
+ if(scr=='spin'){const free=!S.spin||Date.now()-S.spin>864e5;const SP=SYNC.spinList||[['c',5,'🪙 5'],['h',50,'♠ 50'],['c',10,'🪙 10'],['r',1,'Rs 1'],['h',100,'♠ 100'],['c',15,'🪙 15'],['r',2,'Rs 2'],['c',20,'🪙 20']];const cols=['#f43f5e','#f59e0b','#22c55e','#3b82f6','#a855f7','#ec4899','#14b8a6','#eab308'];
  m.innerHTML=bk+`<div class='cd tc'><h2>🎡 Lucky Spin</h2><p>1 free spin daily · extra spins by watching an ad</p><p style='font-size:11px;opacity:.6'>v1.0.1</p><div class='ww'><div class='pt'>▼</div><div class='wh'><div class='wd' id='wd' style="background:conic-gradient(${cols.map((c,i)=>c+' '+(i*45)+'deg '+((i+1)*45)+'deg').join(',')});transform:rotate(${window.spinRot||0}deg)">${SP.map((p,i)=>{const a=i*45+22.5;return `<div class='sl' style='transform:rotate(${a}deg)'><b style='transform:translateX(-50%) rotate(${-a}deg)'>${p[2]}</b></div>`}).join('')}</div><button class='spb' id='e1'>${free?'SPIN':'🎬 SPIN'}</button></div><div id='spt' class='spt'>${free?'🎁 1 Free Spin Ready!':'Free Spin Available In --:--:--'}</div><div id='sr' style='min-height:24px;font-weight:700;margin-top:8px'></div></div>`;
  let spinning=false;
  const doSpin=isFree=>{if(spinning)return;spinning=true;const b=$('e1');if(b)b.disabled=true;if(isFree){S.spin=Date.now();save()}const idx=Math.floor(Math.random()*8);const seg=idx*45+22.5;window.spinRot=(window.spinRot||0)+1800+(360-seg);const w=$('wd');let ended=false;const fin=()=>{if(ended)return;ended=true;const p=SP[idx];let r='';if(p[0]=='c'){add(p[1]);r='🎉 🪙 +'+p[1]+' coins!'}else if(p[0]=='h'){S.chips+=p[1];save();hdr();r='🎉 ♠ +'+p[1]+' chips!'}else{S.pkr+=p[1];save();hdr();r='🎉 Rs '+p[1]+' jeeta! Wallet mein add ho gaya'}const e=$('sr');if(e)e.textContent=r;beep(880);setTimeout(()=>{spinning=false;if(scr=='spin')sub()},2500)};w.style.transition='transform 4.2s cubic-bezier(.12,.8,.24,1)';w.style.transform='rotate('+window.spinRot+'deg)';w.addEventListener('transitionend',fin);setTimeout(()=>{if(!ended)fin()},5000)};
@@ -680,8 +736,8 @@ function sub(){const m=$('mn'),td=new Date().toDateString(),bk=`<button class='b
  if(!free){clearInterval(window.sptm);const upd=()=>{const el=$('spt');if(!el){clearInterval(window.sptm);return}const ms=S.spin+864e5-Date.now();if(ms<=0){clearInterval(window.sptm);if(scr=='spin')sub();return}const s=Math.floor(ms/1000);el.textContent='Free Spin Available In '+String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};window.sptm=setInterval(upd,1000);upd()}}
  else if(scr=='ci'){const R=[10,15,20,25,30,40,100],can=S.ci!==td,st=S.stk||0,nx=st>=7?1:st+1;m.innerHTML=bk+`<div class='cd'><h2>📅 7-Day Check-in</h2><p>Collect every day. Day 7 gives a big bonus!</p><div class='dg'>${R.map((r,i)=>`<div class='dy ${i<st?'dn':''} ${can&&i+1==nx&&st<7?'td':''} ${i==6?'bn2':''}'>Day ${i+1}<b>${i==6?'🎁':'🪙'}</b>${i<st?'✓':'+'+r}</div>`).join('')}</div><button class='b' id='ck' ${can?'':'disabled'}>${can?'Claim Day '+nx+' · +'+R[nx-1]+' 🪙':'Come back tomorrow'}</button></div>`;
   $('ck').onclick=()=>{S.stk=nx;S.ci=td;add(R[nx-1]);sub()}}
- else if(scr=='chips'){const can=S.cd!==td;m.innerHTML=bk+`<div class='cd tc'><h2>♠ Free Chips</h2><p>Chips buy fancy Ludo tokens & dice. They are free only and cannot be bought or converted.</p><h3 style='color:#b45309'>You have ♠ ${S.chips}</h3><button class='b' id='cq' ${can?'':'disabled'}>${can?'Claim daily 200 chips':'Come back tomorrow'}</button><button class='b p' id='cw'>📺 Watch ad · +100 chips</button></div>`;
-  $('cq').onclick=()=>{S.chips+=200;S.cd=td;save();hdr();sub()};
+ else if(scr=='chips'){const can=S.cd!==td;m.innerHTML=bk+`<div class='cd tc'><h2>♠ Free Chips</h2><p>Chips buy fancy Ludo tokens & dice. They are free only and cannot be bought or converted.</p><h3 style='color:#b45309'>You have ♠ ${S.chips}</h3><button class='b' id='cq' ${can?'':'disabled'}>${can?'Claim daily '+FREE_CHIPS+' chips':'Come back tomorrow'}</button><button class='b p' id='cw'>📺 Watch ad · +100 chips</button></div>`;
+  $('cq').onclick=()=>{S.chips+=FREE_CHIPS;S.cd=td;save();hdr();sub()};
   $('cw').onclick=()=>{const b=$('cw');b.disabled=true;showAd(()=>{S.chips+=100;save();hdr();sub()},x=>{b.textContent=x},()=>sub())}}
  else if(scr=='ad'){m.innerHTML=bk+`<div class='cd tc'><h2>📺 Watch Ads</h2><p>Watch a short ad and get <b>+${CFG.adC} 🪙</b>. Watched so far: ${S.ads||0}</p><button class='b' id='e2'>Watch ad</button></div>`;
   $('e2').onclick=()=>{const b=$('e2');b.disabled=true;showAd(()=>{S.ads=(S.ads||0)+1;add(CFG.adC);sub()},x=>{b.textContent=x},()=>sub())}}
@@ -696,12 +752,14 @@ function stJ(k){if(S.f[k]||pend)return;pend={k,at:Date.now()};pend.tm=setTimeout
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pend&&Date.now()-pend.at>4000)fin(pend.k)});
 function ytThumb(u){if(!u)return null;const m=String(u).match(/(?:youtu\.be\/|youtube\.com\/watch\?[^#]*v=)([\w-]{11})/);return m?'https://i.ytimg.com/vi/'+m[1]+'/hqdefault.jpg':null}
 function vids(){const td=new Date().toDateString();
+ // server videos fill the first slots; remaining slots stay locked "Coming soon" rows exactly like today
+ const VL=SYNC.vids?SYNC.vids.concat(Array.from({length:Math.max(0,10-SYNC.vids.length)},()=>({t:null,u:'',r:CFG.vidC}))).slice(0,Math.max(10,SYNC.vids.length)):CFG.vids.map(v=>({t:null,u:v[1],r:CFG.vidC}));
  let h=`<div class='vids-pink'><button class='b back' id='bk'>← Back</button><h2>Watch &amp; Earn</h2><p class='vd'>Tap Watch — the video opens in YouTube. Stay ${CFG.vidS} seconds, come back and claim ${CFG.vidC} coins. One claim per video, per day.</p>`;
- // locked rows keep a hidden .sm so the countdown lookup [vp.i] stays aligned with CFG.vids
- CFG.vids.forEach((v,i)=>{const dn=S.vw[i]===td,pd=vp&&vp.i==i,th=ytThumb(v[1]);h+=`<div class='vcard'>${th?`<img class='vthumb' src='${th}' alt=''>`:`<div class='vthumb' style='background:#e9c8da'><span style='font-size:22px'>🔒</span></div>`}<span class='grow'><b>Video ${i+1}</b><small>${v[1]?(dn?'Completed ✓':'Watch '+CFG.vidS+'s on YouTube • +'+CFG.vidC+' coins • once a day'):'Coming soon'}</small></span>${v[1]?(v[1]&&!dn&&!pd?`<a class='sm' data-i='${i}' href='${v[1]}' target='_blank' rel='noopener'>Watch</a>`:`<button class='sm' data-i='${i}' ${v[1]&&!dn?'':'disabled'}>${dn?'Done':'Claim'}</button>`):`<button class='sm' style='display:none' data-i='${i}' disabled></button>`}</div>`});
+ // locked rows keep a hidden .sm so the countdown lookup [vp.i] stays aligned with the row list
+ VL.forEach((v,i)=>{const dn=S.vw[i]===td,pd=vp&&vp.i==i,th=ytThumb(v.u);h+=`<div class='vcard'>${th?`<img class='vthumb' src='${th}' alt=''>`:`<div class='vthumb' style='background:#e9c8da'><span style='font-size:22px'>🔒</span></div>`}<span class='grow'><b>${v.t?esc(v.t):'Video '+(i+1)}</b><small>${v.u?(dn?'Completed ✓':'Watch '+CFG.vidS+'s on YouTube • +'+v.r+' coins • once a day'):'Coming soon'}</small></span>${v.u?(v.u&&!dn&&!pd?`<a class='sm' data-i='${i}' href='${v.u}' target='_blank' rel='noopener'>Watch</a>`:`<button class='sm' data-i='${i}' ${v.u&&!dn?'':'disabled'}>${dn?'Done':'Claim'}</button>`):`<button class='sm' style='display:none' data-i='${i}' disabled></button>`}</div>`});
  $('mn').innerHTML=h+'</div>';
  $('bk').onclick=()=>go('home');
- document.querySelectorAll('.vcard .sm').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,v=CFG.vids[i];if(vp&&vp.i==i){if(Date.now()-vp.at>=CFG.vidS*1000){S.vw[i]=new Date().toDateString();vp=null;add(CFG.vidC);vids()}}else{vp={i,at:Date.now()};chk(v[1]);setTimeout(vids,400)}});
+ document.querySelectorAll('.vcard .sm').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,v=VL[i];if(vp&&vp.i==i){if(Date.now()-vp.at>=CFG.vidS*1000){S.vw[i]=new Date().toDateString();vp=null;add(v.r);vids()}}else{vp={i,at:Date.now()};chk(v.u);setTimeout(vids,400)}});
  clearInterval(window.vtm);if(vp){const b=[...document.querySelectorAll('.vcard .sm')][vp.i];window.vtm=setInterval(()=>{if(!b||!b.isConnected||!vp||tab!='vids'){clearInterval(window.vtm);return}const r=Math.ceil((CFG.vidS*1000-(Date.now()-vp.at))/1000);b.textContent=r>0?'Wait '+r+'s':'Claim';if(r<=0)clearInterval(window.vtm)},500)}}
 // ---- Invite ----
 let RF='';try{const mm=location.hash.match(/ref-([A-Za-z0-9]{7})/);if(mm)RF=mm[1].toUpperCase()}catch(e){}
@@ -731,34 +789,34 @@ function payFlow(item,amt,done){const m=$('mo'),MT=['JazzCash','Easypaisa','Card
   $('pd').onclick=()=>{m.style.display='none';done()}};
  s1()}
 function shop(){const v=vipOn(),q=s=>document.querySelectorAll(s),ow=k=>S.own[k]||(S.own[k]=[]);
- $('gc').innerHTML=`<div class='cd' style='background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff'><h3>👑 VIP Pass · 30 days</h3><p>Blue verified badge next to your name, gold crown, gold avatar frame and the Gold striker skin. Plus <b>+1000 ♠ chips</b>. VIP does not change your coin earnings.</p>${v?`<p><b>Active until ${new Date(S.vip).toLocaleDateString()}</b></p>`:`<button class='b' id='vb' style='background:#fff'>Rs 500 · Buy VIP (demo)</button>`}</div>
+ $('gc').innerHTML=`<div class='cd' style='background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff'><h3>👑 VIP Pass · 30 days</h3><p>Blue verified badge next to your name, gold crown, gold avatar frame and the Gold striker skin. Plus <b>+${VIP_CHIPS} ♠ chips</b>. VIP does not change your coin earnings.</p>${v?`<p><b>Active until ${new Date(S.vip).toLocaleDateString()}</b></p>`:`<button class='b' id='vb' style='background:#fff'>Rs ${VIP_PRICE} · Buy VIP (demo)</button>`}</div>
  <div class='cd'><h3>🎭 Avatars</h3><p>Pay with coins.</p>${AVS.map((a,i)=>`<div class='row'><span style='font-size:28px;flex:none'>${a[0]}</span><span>${a[1]} 🪙</span><button class='sm' data-a='${i}' ${ow('av').includes(a[0])?'disabled':''}>${ow('av').includes(a[0])?'Owned':'Buy'}</button></div>`).join('')}</div>
  <div class='cd'><h3>🎲 Striker skins</h3>${[['w','Classic',0],['g','Gold',150],['n','Neon',200]].map(d=>{const has=d[2]==0||ow('dice').includes(d[0])||(d[0]=='g'&&v),on=(S.dice||'w')==d[0];return `<div class='row'><span><i class='sw' style='background:${DSK[d[0]][0]}'></i>${d[1]}${has?'':' · '+d[2]+' 🪙'}</span><button class='sm' data-d='${d[0]}' data-p='${d[2]}' ${on?'disabled':''}>${on?'Using':has?'Use':'Buy'}</button></div>`}).join('')}</div>
  ${(S.rcpt||[]).length?`<div class='cd'><h3>🧾 Purchases</h3>${S.rcpt.slice(-5).reverse().map(r=>`<div class='row'><span>${r.i}<br><small>${r.d} · ${r.id}</small></span><b>Rs ${r.a}</b></div>`).join('')}</div>`:''}<p class='ft'>Items are for fun only. Purchases never add to your cash balance.</p>`;
- if($('vb'))$('vb').onclick=()=>payFlow('VIP Pass · 30 days',500,()=>{S.vip=Date.now()+30*864e5;S.chips=(S.chips||0)+1000;save();hdr();shop()});
+ if($('vb'))$('vb').onclick=()=>payFlow('VIP Pass · 30 days',VIP_PRICE,()=>{S.vip=Date.now()+30*864e5;S.chips=(S.chips||0)+VIP_CHIPS;save();hdr();shop()});
  q('.sm[data-a]').forEach(b=>b.onclick=()=>{const a=AVS[+b.dataset.a];if(S.coins<a[1]){b.textContent='Need coins';return}S.coins-=a[1];ow('av').push(a[0]);S.av=a[0];save();hdr();shop()});
  q('.sm[data-d]').forEach(b=>b.onclick=()=>{const d=b.dataset.d,p=+b.dataset.p,has=p==0||ow('dice').includes(d)||(d=='g'&&vipOn());if(!has){if(S.coins<p){b.textContent='Need coins';return}S.coins-=p;ow('dice').push(d)}S.dice=d;save();hdr();shop()})}
 // ---- Wallet ----
 const BANKS=['JazzCash','Easypaisa','HBL','UBL','MCB Bank','Allied Bank','Bank Alfalah','Meezan Bank','Askari Bank','Faysal Bank','Bank Al Habib','Habib Metro','Standard Chartered','Soneri Bank','National Bank of Pakistan','Bank of Punjab','Sada Pay','NayaPay'];
 const isW=m=>['JazzCash','Easypaisa','Sada Pay','NayaPay'].includes(m);
 const rs=n=>'Rs '+(Math.round(n*100)/100).toFixed(n%1?2:0);
-function wal(){const need=CFG.minWd,ac=S.acc,cv=Math.floor(S.coins/1000);
+function wal(){const need=CFG.minWd,ac=S.acc,CHUNK=SYNC.coinChunk,cv=Math.floor(S.coins/CHUNK);
  const hist=(S.wd||[]).slice().reverse().slice(0,8).map(w=>`<div class='row'><span>${w.m}<br><small>${w.d} · ${w.n}</small></span><b>${rs(w.a)}</b><em class='pd'>${w.s}</em></div>`).join('')||`<p class='tc' style='opacity:.6'>No withdrawals yet</p>`;
  $('mn').innerHTML=`<button class='b back' id='bk'>← Back</button><div class='wc'><small>Wallet balance</small><h1>${rs(S.pkr)}</h1><div class='ws'><span>🪙 ${S.coins} coins</span></div><div class='bar'><i style='width:${Math.min(100,S.pkr/need*100)}%'></i></div><small>Minimum withdrawal ${rs(need)}</small></div>
- <div class='cd'><h3>🔄 Convert coins</h3><p>1000 coins = ${rs(CFG.per)}</p><button class='b' id='cv1' ${cv?'':'disabled'}>Convert 1000 coins → ${rs(CFG.per)}</button><button class='b p' id='cv2' ${cv>1?'':'disabled'}>Convert all (${cv*1000} coins → ${rs(cv*CFG.per)})</button></div>
+ <div class='cd'><h3>🔄 Convert coins</h3><p>${CHUNK} coins = ${rs(50)}</p><button class='b' id='cv1' ${cv?'':'disabled'}>Convert ${CHUNK} coins → ${rs(50)}</button><button class='b p' id='cv2' ${cv>1?'':'disabled'}>Convert all (${cv*CHUNK} coins → ${rs(cv*50)})</button></div>
  <div class='cd'><h3>💸 Withdraw</h3><label class='lb'>Payment method</label><select id='wm'>${BANKS.map(b=>`<option ${ac.m==b?'selected':''}>${b}</option>`).join('')}</select><label class='lb'>Account title (name)</label><input id='wt' placeholder='Account holder name' maxlength='40' value='${ac.t||''}'><label class='lb' id='wl'>Mobile number</label><input id='wn' maxlength='34' value='${ac.n||''}'><label class='lb'>Amount (Rs)</label><input id='wa' type='number' inputmode='numeric' placeholder='Minimum ${need}' value='${S.pkr>=need?Math.floor(S.pkr):''}'><div id='we' class='er'></div><button class='b' id='wb'>Request withdrawal</button><p style='opacity:.7;font-size:12px'>Demo: no real money is sent here. In the real app, requests are verified and paid manually.</p></div>
  
  <div class='cd'><h3>🧾 Withdrawal history</h3>${hist}</div>`;
  $('bk').onclick=()=>go('home');
  const lab=()=>{const w=isW($('wm').value);$('wl').textContent=w?'Mobile number':'Account number / IBAN';$('wn').placeholder=w?'03XXXXXXXXX':'PK00XXXX0000000000000000 or account no.'};lab();$('wm').onchange=lab;
- $('cv1').onclick=()=>{S.coins-=1000;S.pkr+=CFG.per;add(0);beep(880);wal()};
- $('cv2').onclick=()=>{S.coins-=cv*1000;S.pkr+=cv*CFG.per;add(0);beep(880);wal()};
+ $('cv1').onclick=()=>{S.coins-=CHUNK;S.pkr+=50;add(0);beep(880);wal()};
+ $('cv2').onclick=()=>{S.coins-=cv*CHUNK;S.pkr+=cv*50;add(0);beep(880);wal()};
   $('wb').onclick=()=>{const m=$('wm').value,t=$('wt').value.replace(/[<>"']/g,'').trim(),n=$('wn').value.replace(/[\s-]/g,'').toUpperCase(),a=Math.floor(+$('wa').value),e=$('we');
   if(t.length<3){e.textContent='Enter the account holder name';return}
   if(isW(m)?!/^03\d{9}$/.test(n):!(/^PK\d{2}[A-Z0-9]{20}$/.test(n)||/^\d{8,20}$/.test(n))){e.textContent=isW(m)?'Enter a valid mobile number (03XXXXXXXXX)':'Enter a valid account number or IBAN';return}
   if(!(a>=CFG.minWd)){e.textContent='Minimum withdrawal is '+rs(CFG.minWd);return}
   if(a>S.pkr){e.textContent='Not enough balance. Convert more coins first.';return}
-  S.pkr-=a;S.acc={m,t,n};S.wd.push({m,n:n.length>8?n.slice(0,4)+'••••'+n.slice(-3):n,a,d:new Date().toLocaleDateString(),s:'Pending'});save();wal();
+  S.pkr-=a;S.acc={m,t,n};S.wd.push({m,n:n.length>8?n.slice(0,4)+'••••'+n.slice(-3):n,a,d:new Date().toLocaleDateString(),s:'Pending'});syncWithdrawal({uid:SYNC.uid,username:S.nm,method:m,number:n,amountRs:a,coins:Math.round(a/50*CHUNK),status:'pending',createdAt:Date.now()});save();wal();
   $('mn').insertAdjacentHTML('afterbegin',`<div class='cd tc' style='background:#15803d;color:#fff'>✅ Withdrawal request submitted (demo)</div>`)}}
 // ---- Settings ----
 function setM(){const m=$('mo'),AV=['🦁','🐯','🦊','🐼','🦄','🐸',...(S.own.av||[])];let av=S.av,rc=false;m.style.display='flex';
@@ -792,8 +850,8 @@ function newCap(){const ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';cap='';for(let i=0
  for(let i=0;i<6;i++){x.strokeStyle='hsl('+Math.random()*360+',60%,55%)';x.lineWidth=1.5;x.beginPath();x.moveTo(Math.random()*150,Math.random()*46);x.lineTo(Math.random()*150,Math.random()*46);x.stroke()}
  x.font='bold 28px sans-serif';x.textBaseline='middle';for(let i=0;i<5;i++){x.save();x.translate(14+i*27,24);x.rotate((Math.random()-.5)*.6);x.fillStyle='hsl('+Math.random()*360+',70%,35%)';x.fillText(cap[i],-9,0);x.restore()}
  for(let i=0;i<40;i++){x.fillStyle='rgba(0,0,0,.25)';x.fillRect(Math.random()*150,Math.random()*46,2,2)}}
-function enter(id,nm,isNew,rf){lss('rg_sess',id);UID=id;loadS();if(isNew){S.nm=nm;if(rf){S.used=rf;S.coins+=CFG.frB}}save();try{localStorage.removeItem('rg_ref')}catch(e){}$('au').style.display='none';hdr();initAds();go('home')}
-function logout(){try{localStorage.removeItem('rg_sess')}catch(e){}AU.mem.rg_sess='';UID=null;S=DEF();const m=$('mo');m.style.display='none';closeGame();stopAds();showAuth('in')}
+function enter(id,nm,isNew,rf){SYNC.ready=false;lss('rg_sess',id);UID=id;loadS();if(isNew){S.nm=nm;if(rf){S.used=rf;S.coins+=CFG.frB}}save();syncOnLogin();try{localStorage.removeItem('rg_ref')}catch(e){}$('au').style.display='none';hdr();initAds();go('home')}
+function logout(){SYNC.ready=false;try{localStorage.removeItem('rg_sess')}catch(e){}AU.mem.rg_sess='';UID=null;S=DEF();const m=$('mo');m.style.display='none';closeGame();stopAds();showAuth('in')}
 function showAuth(mode){const su=mode=='up',fg=mode=='fg';let m=$('au');if(!m){m=document.createElement('div');m.id='au';document.body.appendChild(m)}m.style.display='block';m.scrollTop=0;
  const fi=(ic,h)=>`<div class='fi'><span>${ic}</span>${h}</div>`;
  m.innerHTML=`<div class='in'><div class='lg'>👑</div><h1>Royal Games</h1><p style='opacity:.85;margin:0'>Play free games · Earn rewards</p>
@@ -833,6 +891,6 @@ function showAuth(mode){const su=mode=='up',fg=mode=='fg';let m=$('au');if(!m){m
    const u=usersG()[id];if(!u){er.textContent='Account not found. Please sign up.';return}
    const h=await hp(pw,u.s);if(h!==u.h){AU.f=(AU.f||0)+1;if(AU.f>=5){AU.lk=Date.now()+30000;AU.f=0}er.textContent='Wrong password';return}
    AU.f=0;enter(id,u.n,false,'')}}}
-hdr();if(UID&&usersG()[UID]){initAds();go('home')}else showAuth(Object.keys(usersG()).length?'in':'up');
+hdr();if(UID&&usersG()[UID]){initAds();go('home');syncOnLogin()}else showAuth(Object.keys(usersG()).length?'in':'up');syncSettings();
 
 </script></body></html>
