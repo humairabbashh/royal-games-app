@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><title>Royal Games – Free Coins</title>
+<html lang="en"><head><meta charset="utf-8"><title>Free Paisa – Free Coins</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
 :root{--g:#ffd23f;--b1:#1a0b2e;--b2:#3b1d7a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -767,7 +767,7 @@ if(RF){try{localStorage.setItem('rg_ref',RF)}catch(e){}}else{try{RF=localStorage
 function inv(){$('mn').innerHTML=`<button class='b back' id='bk'>← Back</button><h3 class='h3'>🤝 Invite Friends</h3><div class='cd tc'><p>Your referral code</p><h2 style='font-size:30px;letter-spacing:3px;color:#b45309'>${S.rc}</h2><p>Your friend gets ${CFG.frB} coins when joining with your code. You earn ${CFG.refB} coins when they complete 5 missions (tracked on a server in the real app).</p><button class='b' id='sh'>Share my code</button></div>
  <div class='cd'><b>Have a friend's code?</b><input id='rcin' placeholder='e.g. RGAB12C' maxlength='7' value='${S.used||''}' ${S.used?'disabled':''}><button class='b p' id='ap' ${S.used?'disabled':''}>${S.used?'Code applied ✓':'Apply code'}</button><p style='opacity:.7'>Demo: real referral tracking needs a server (Firebase).</p></div>`;
  $('bk').onclick=()=>go('home');
- $('sh').onclick=()=>{const t='Play free games and earn coins on Royal Games! Use my code '+S.rc+(CFG.app?' '+CFG.app+'#ref-'+S.rc:'');if(navigator.share)navigator.share({text:t}).catch(()=>{});else lm(t)};
+ $('sh').onclick=()=>{const t='Play free games and earn coins on Free Paisa! Use my code '+S.rc+(CFG.app?' '+CFG.app+'#ref-'+S.rc:'');if(navigator.share)navigator.share({text:t}).catch(()=>{});else lm(t)};
  $('ap').onclick=()=>{const c=$('rcin').value.trim().toUpperCase();if(!/^RG[A-Z0-9]{5}$/.test(c)||c==S.rc){$('ap').textContent='Invalid code';return}S.used=c;add(CFG.frB);inv()}}
 // ---- Teen Patti lobby, leaderboard, weekly cup ----
 function vtb(s){let p='';for(let i=0;i<20;i++){const r=i%2?9.3:11.2,a=i*Math.PI/10;p+=(i?'L':'M')+(12+r*Math.sin(a)).toFixed(2)+' '+(12-r*Math.cos(a)).toFixed(2)}
@@ -829,7 +829,7 @@ function setM(){const m=$('mo'),AV=['🦁','🐯','🦊','🐼','🦄','🐸',..
  <button class='b' id='ss'>Save</button><button class='b p' id='lo'>Log out</button><button class='b back' id='sr'>Reset my game data</button></div>`;
  m.querySelectorAll('.avs button').forEach(b=>b.onclick=()=>{av=b.dataset.a;m.querySelectorAll('.avs button').forEach(x=>x.classList.toggle('on',x==b))});
  $('sx').onclick=()=>{m.style.display='none'};
- $('cs').onclick=()=>{const t=$('ct').value.trim();if(!t){$('ct').focus();return}location.href='mailto:'+CFG.mail+'?subject='+encodeURIComponent('Royal Games — Contact')+'&body='+encodeURIComponent(t)};
+ $('cs').onclick=()=>{const t=$('ct').value.trim();if(!t){$('ct').focus();return}location.href='mailto:'+CFG.mail+'?subject='+encodeURIComponent('Free Paisa — Contact')+'&body='+encodeURIComponent(t)};
  $('ss').onclick=()=>{S.nm=($('sn').value.replace(/[<>"']/g,'').trim())||'Player';S.av=av;S.snd=$('s1').checked;S.acc={m:$('sm').value,t:$('st2').value.replace(/[<>"']/g,'').trim(),n:$('sa').value.replace(/[\s-]/g,'').toUpperCase()};save();m.style.display='none';go(tab)};
  $('pc').onclick=async()=>{const e=$('pe'),us=usersG(),u=us[UID];e.style.color='';if(!u){e.textContent='Please log in first';return}
   const p0=$('p0').value,p1=$('p1').value;if(await hp(p0,u.s)!==u.h){e.textContent='Current password is wrong';return}
@@ -854,7 +854,7 @@ function enter(id,nm,isNew,rf){SYNC.ready=false;lss('rg_sess',id);UID=id;loadS()
 function logout(){SYNC.ready=false;try{localStorage.removeItem('rg_sess')}catch(e){}AU.mem.rg_sess='';UID=null;S=DEF();const m=$('mo');m.style.display='none';closeGame();stopAds();showAuth('in')}
 function showAuth(mode){const su=mode=='up',fg=mode=='fg';let m=$('au');if(!m){m=document.createElement('div');m.id='au';document.body.appendChild(m)}m.style.display='block';m.scrollTop=0;
  const fi=(ic,h)=>`<div class='fi'><span>${ic}</span>${h}</div>`;
- m.innerHTML=`<div class='in'><div class='lg'>👑</div><h1>Royal Games</h1><p style='opacity:.85;margin:0'>Play free games · Earn rewards</p>
+ m.innerHTML=`<div class='in'><div class='lg'>👑</div><h1>Free Paisa</h1><p style='opacity:.85;margin:0'>Play free games · Earn rewards</p>
  <div class='ac'>${fg?`<h3 style='margin:0 0 4px'>🔑 Reset password</h3><p style='opacity:.75;font-size:13px;margin:0'>Enter your account and the full name you used when signing up.</p>`:`<div class='tabs'><button id='t1' class='${su?'on':''}'>Sign up</button><button id='t2' class='${su?'':'on'}'>Log in</button></div>`}
  ${su?fi('👤',`<input id='an' placeholder='Full name' maxlength='30' autocomplete='name'>`):''}
  <div class='tabs' style='margin-top:12px'><button id='k1' class='${AU.it!='e'?'on':''}'>📱 Mobile</button><button id='k2' class='${AU.it=='e'?'on':''}'>✉️ Email</button></div>${fi(AU.it=='e'?'✉️':'📱',`<input id='ai' type='${AU.it=='e'?'email':'tel'}' inputmode='${AU.it=='e'?'email':'tel'}' placeholder='${AU.it=='e'?'Email address':'Mobile number (03XXXXXXXXX)'}' autocomplete='username'>`)}

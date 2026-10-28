@@ -35,6 +35,8 @@ jobs:
               t=t.replace('</resources>','    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>\n</resources>',1)
               open(st,'w').write(t)
           EOF
+      - name: Set Free Paisa app icon
+        run: cp -r android-res/. android/app/src/main/res/
       - name: Build debug APK
         run: |
           cd android

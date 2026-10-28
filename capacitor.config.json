@@ -1,8 +1,12 @@
 {
   "appId": "com.royalgames.app",
-  "appName": "Royal Games",
+  "appName": "Free Paisa",
   "version": "1.0.1",
   "webDir": "www",
-  "server": { "androidScheme": "https" },
-  "android": { "allowMixedContent": false }
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
 }
